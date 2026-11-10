@@ -1,0 +1,45 @@
+name: Deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unpack uploaded source bundle (if any)
+        run: |
+          if [ -f bundle.tar.gz ]; then
+            tar -xzf bundle.tar.gz && rm bundle.tar.gz
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A && git commit -m "Unpack source bundle" && git push
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx next build
+        env:
+          PAGES_BASE: /safesafe
+      - run: touch out/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.d.outputs.page_url }}
+    steps:
+      - id: d
+        uses: actions/deploy-pages@v4
