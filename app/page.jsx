@@ -16,6 +16,7 @@ export default function Home() {
   const [reviews, setReviews] = useState([]);
   const [q, setQ] = useState('');
   const [calc, setCalc] = useState(2400);
+  const [sel, setSel] = useState('all');
 
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -58,33 +59,38 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section wrap" aria-labelledby="cats">
-        <div className="section-head"><div><span className="kicker">קטגוריות</span><h2 id="cats">מה מוכרים עכשיו</h2></div><Link href="/search/" className="btn ghost sm">כל הפריטים</Link></div>
-        <nav className="shelf" aria-label="קטגוריות">
-          {CAT_KEYS.map(k => {
-            const list = (items || []).filter(l => l.category === k);
-            const min = list.length ? Math.min(...list.map(l => l.price)) : null;
-            const next = list.length ? list.reduce((a, l) => (l.starts_on < a ? l.starts_on : a), list[0].starts_on) : null;
-            return (
-              <Link key={k} href={`/search/?cat=${k}`} className={`cat ${!list.length ? 'empty-cat' : ''}`} style={{ '--h': CAT_HUE[k] }}>
-                <span className="cat-ico"><Glyph cat={k} size={26} /></span>
-                <span className="cat-nm">{CATS[k].he}</span>
-                <span className="cat-info">
-                  {items === null ? '…' : list.length ? <>
-                    <span>החל מ-<b className="num">{ils(min)}</b></span>
-                    <span className="muted">הקרוב: {dShort(next)}</span>
-                  </> : <span className="muted">{CATS[k].soon ? 'בקרוב' : 'אין כרגע פריטים'}</span>}
-                </span>
-                {list.length > 0 && <span className="cat-count num">{list.length}</span>}
-              </Link>
-            );
-          })}
-        </nav>
-      </section>
-
-      <section className="wrap" aria-labelledby="soon">
-        <div className="section-head"><div><span className="kicker">הקרובים ביותר</span><h2 id="soon">יוצאים בקרוב</h2></div></div>
-        {items === null ? <Loading /> : <div className="tickets">{items.slice(0, 9).map(l => <Ticket key={l.id} l={l} seller={l.seller} />)}</div>}
+      <section className="section wrap" aria-labelledby="now">
+        <div className="section-head"><div><span className="kicker">מתעדכן בזמן אמת</span><h2 id="now">מה מוכרים עכשיו</h2></div></div>
+        <div className="explore" style={{ '--h': sel === 'all' ? 24 : CAT_HUE[sel] }}>
+          <div className="ex-tabs" role="tablist" aria-label="קטגוריות">
+            {['all', ...CAT_KEYS].map(k => {
+              const list = k === 'all' ? (items || []) : (items || []).filter(l => l.category === k);
+              const min = list.length ? Math.min(...list.map(l => l.price)) : null;
+              return (
+                <button key={k} role="tab" aria-selected={sel === k} className={`ex-tab ${!list.length && items ? 'none' : ''}`} style={{ '--h': k === 'all' ? 24 : CAT_HUE[k] }} onClick={() => setSel(k)}>
+                  <span className="ex-ico">{k === 'all' ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="4" y="4" width="7" height="7" rx="1.5" /><rect x="13" y="4" width="7" height="7" rx="1.5" /><rect x="4" y="13" width="7" height="7" rx="1.5" /><rect x="13" y="13" width="7" height="7" rx="1.5" /></svg> : <Glyph cat={k} size={22} />}</span>
+                  <span className="ex-nm">{k === 'all' ? 'הכל' : CATS[k].he}</span>
+                  <span className="ex-sub">{items === null ? '…' : list.length ? <>{list.length} · מ-<b className="num">{ils(min)}</b></> : CATS[k]?.soon ? 'בקרוב' : 'אין כרגע'}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="ex-panel" role="tabpanel" key={sel}>
+            {(() => {
+              const list = (items || []).filter(l => sel === 'all' || l.category === sel);
+              const name = sel === 'all' ? 'כל הקטגוריות' : CATS[sel].he;
+              if (items === null) return <Loading />;
+              return <>
+                <div className="ex-head">
+                  <div><b>{sel === 'all' ? 'הקרובים ביותר' : name}</b><span className="muted">{list.length ? ` · ${list.length} פריטים, ממוינים לפי תאריך` : ''}</span></div>
+                  {list.length > 0 && <Link href={sel === 'all' ? '/search/' : `/search/?cat=${sel}`} className="btn ghost sm">לכל ה{sel === 'all' ? 'פריטים' : name} ←</Link>}
+                </div>
+                {list.length ? <div className="tickets">{list.slice(0, 6).map(l => <Ticket key={l.id} l={l} seller={l.seller} />)}</div>
+                  : <div className="empty">{CATS[sel]?.soon ? 'טיסות מתווספות בשלב הבא. כבר עכשיו אפשר לפרסם כרטיס טיסה שניתן להעברה.' : 'אין כרגע פריטים בקטגוריה הזו.'} <Link href="/sell/">יש לך משהו למכור?</Link></div>}
+              </>;
+            })()}
+          </div>
+        </div>
       </section>
 
       <section className="section wrap" aria-labelledby="pledges">

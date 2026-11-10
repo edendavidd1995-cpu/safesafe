@@ -70,7 +70,7 @@ export function Ticket({ l, seller }) {
   return (
     <Link href={`/item/?id=${l.id}`} className="ticket" style={{ '--h': l.hue }}>
       <div className="t-main">
-        <div className="t-code mono"><span className="t-cat"><Glyph cat={l.category} size={15} />{c.code}</span><span>№ {shortRef(l.id)}</span></div>
+        <div className="t-code mono"><span className="t-cat"><Glyph cat={l.category} size={15} />{c.one}</span><span>№ {shortRef(l.id)}</span></div>
         <h3 className="t-title">{l.title}</h3>
         <div className="t-meta"><span>{l.city}{l.region === 'abroad' ? `, ${l.country}` : ''}</span><span className="num">{dateRange(l)}</span></div>
         <div className="t-perf" aria-hidden="true" />
