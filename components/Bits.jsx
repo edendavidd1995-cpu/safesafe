@@ -56,9 +56,9 @@ export function Stamp({ small }) {
       <g filter="url(#rough)" fill="none" stroke="currentColor">
         <circle cx="60" cy="60" r="56" strokeWidth="3" />
         <circle cx="60" cy="60" r="48" strokeWidth="1.2" strokeDasharray="3 3" />
-        <text x="60" y="34" textAnchor="middle" fill="currentColor" stroke="none" fontSize="10" fontWeight="700" letterSpacing="2" fontFamily="IBM Plex Mono, monospace">SAFESAFE</text>
+        <text x="60" y="34" textAnchor="middle" fill="currentColor" stroke="none" fontSize="10" fontWeight="700" letterSpacing="2" fontFamily="Rubik, sans-serif">SAFESAFE</text>
         <path d="M42 58l12 12 24-24" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-        <text x="60" y="96" textAnchor="middle" fill="currentColor" stroke="none" fontSize="17" fontWeight="700" fontFamily="IBM Plex Sans Hebrew, sans-serif">נבדק</text>
+        <text x="60" y="96" textAnchor="middle" fill="currentColor" stroke="none" fontSize="17" fontWeight="700" fontFamily="Rubik, sans-serif">נבדק</text>
       </g>
     </svg>
   );

@@ -1,5 +1,4 @@
-/* SafeSafe — "printed ledger" system: warm paper, ink, one escrow green, one signal red.
-   Display: Frank Ruhl Libre · Text: IBM Plex Sans Hebrew · Figures: IBM Plex Mono */
+/* SafeSafe — warm paper, ink, one escrow green, one signal red. Typeface: Rubik */
 :root{
   --paper:#F3EFE6; --paper-2:#E9E3D5; --card:#FBF9F4; --ink:#15171B; --ink-2:#4B4F58; --ink-3:#7A7D84;
   --rule:#D5CDBB; --rule-2:#E3DDCF;
@@ -7,9 +6,9 @@
   --signal:#E04A2B; --signal-soft:#F7DFD6;
   --warn:#9A5B00; --warn-soft:#F3E5C8;
   --bad:#B3261E; --bad-soft:#F6DCD8;
-  --f-d:"Frank Ruhl Libre",Georgia,serif;
-  --f-t:"IBM Plex Sans Hebrew",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
-  --f-m:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --f-d:"Rubik",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --f-t:"Rubik",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --f-m:"Rubik",system-ui,sans-serif;
   --r:4px; --r2:10px;
   color-scheme:light;
 }
@@ -31,7 +30,7 @@ a{color:inherit}
 button,input,select,textarea{font:inherit;color:inherit}
 h1,h2,h3,h4{font-family:var(--f-d);font-weight:700;line-height:1.1;margin:0;text-wrap:balance;letter-spacing:-.01em}
 p{margin:0}
-.mono{font-family:var(--f-m);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.mono{font-family:var(--f-m);font-variant-numeric:tabular-nums}
 .muted{color:var(--ink-2)}
 .num{font-variant-numeric:tabular-nums}
 .wrap{max-width:1200px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left))}
