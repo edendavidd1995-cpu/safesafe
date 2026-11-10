@@ -15,7 +15,6 @@ export default function Home() {
   const [items, setItems] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [q, setQ] = useState('');
-  const [cat, setCat] = useState('');
   const [calc, setCalc] = useState(2400);
 
   useEffect(() => {
@@ -28,7 +27,7 @@ export default function Home() {
   }, []);
 
   const counts = Object.fromEntries(CAT_KEYS.map(k => [k, (items || []).filter(l => l.category === k).length]));
-  const go = e => { e.preventDefault(); const p = new URLSearchParams(); if (q.trim()) p.set('q', q.trim()); if (cat) p.set('cat', cat); router.push('/search/?' + p.toString()); };
+  const go = e => { e.preventDefault(); const p = new URLSearchParams(); if (q.trim()) p.set('q', q.trim()); router.push('/search/?' + p.toString()); };
 
   return (
     <>
@@ -39,12 +38,16 @@ export default function Home() {
             <p className="hero-sub">הזמנות מלון, חופשות וכרטיסים שמישהו כבר לא יכול לנצל, בהנחה אמיתית. התשלום נכנס לנאמנות ויוצא למוכר רק אחרי שעשיתם צ׳ק-אין או נכנסתם לאירוע.</p>
             <form className="search" onSubmit={go} role="search">
               <input type="search" placeholder="עיר, מלון, הופעה, קבוצה…" value={q} onChange={e => setQ(e.target.value)} aria-label="חיפוש" />
-              <select value={cat} onChange={e => setCat(e.target.value)} aria-label="קטגוריה">
-                <option value="">כל הקטגוריות</option>
-                {CAT_KEYS.map(k => <option key={k} value={k}>{CATS[k].he}</option>)}
-              </select>
               <button className="btn signal" type="submit">חיפוש</button>
             </form>
+            <nav className="hchips" aria-label="קטגוריות">
+              <Link href="/search/" className="hchip all"><span className="hchip-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="4" y="4" width="7" height="7" rx="1.5" /><rect x="13" y="4" width="7" height="7" rx="1.5" /><rect x="4" y="13" width="7" height="7" rx="1.5" /><rect x="13" y="13" width="7" height="7" rx="1.5" /></svg></span>הכל{items && <i className="num">{items.length}</i>}</Link>
+              {CAT_KEYS.map(k => (
+                <Link key={k} href={`/search/?cat=${k}`} className="hchip" style={{ '--h': CAT_HUE[k] }}>
+                  <span className="hchip-ico"><Glyph cat={k} size={15} /></span>{CATS[k].he}{items && counts[k] > 0 && <i className="num">{counts[k]}</i>}
+                </Link>
+              ))}
+            </nav>
             <div className="hero-proof">
               <span><Check />כל מוכר מאמת תעודה מזהה</span>
               <span><Check />כל מסמך נבדק ידנית</span>
