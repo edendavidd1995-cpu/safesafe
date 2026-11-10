@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { sb } from '@/lib/supabase';
-import { CATS, CAT_KEYS, ils, num, FEE, SELLER_COLS } from '@/lib/util';
+import { CATS, CAT_KEYS, ils, num, FEE, SELLER_COLS, dShort } from '@/lib/util';
+
+const CAT_HUE = { hotel: 196, concert: 336, sports: 142, festival: 28, vacation: 218, cruise: 186, flight: 258 };
 import { useApp } from '@/components/App';
 import { Ticket, Glyph, Guilloche, Loading } from '@/components/Bits';
 
@@ -33,7 +35,6 @@ export default function Home() {
       <section className="hero">
         <div className="wrap hero-grid">
           <div>
-            <span className="kicker">יד שנייה להזמנות וכרטיסים · ישראל</span>
             <h1>קונים מאנשים.<br />סומכים על <em>הכספת</em>.</h1>
             <p className="hero-sub">הזמנות מלון, חופשות וכרטיסים שמישהו כבר לא יכול לנצל, בהנחה אמיתית. התשלום נכנס לנאמנות ויוצא למוכר רק אחרי שעשיתם צ׳ק-אין או נכנסתם לאירוע.</p>
             <form className="search" onSubmit={go} role="search">
@@ -55,14 +56,26 @@ export default function Home() {
       </section>
 
       <section className="section wrap" aria-labelledby="cats">
-        <div className="section-head"><div><span className="kicker">לוח יציאות</span><h2 id="cats">מה מוכרים עכשיו</h2></div><Link href="/search/" className="btn ghost sm">כל הפריטים</Link></div>
-        <nav className="board" aria-label="קטגוריות">
-          {CAT_KEYS.map(k => (
-            <Link key={k} href={`/search/?cat=${k}`} className={CATS[k].soon && !counts[k] ? 'soon' : ''}>
-              <span className="code">{CATS[k].code}<Glyph cat={k} /></span>
-              <span><span className="nm">{CATS[k].he}</span><br /><span className="ct">{items ? (counts[k] ? `${counts[k]} פריטים` : CATS[k].soon ? 'בקרוב' : 'אין כרגע') : '···'}</span></span>
-            </Link>
-          ))}
+        <div className="section-head"><div><span className="kicker">קטגוריות</span><h2 id="cats">מה מוכרים עכשיו</h2></div><Link href="/search/" className="btn ghost sm">כל הפריטים</Link></div>
+        <nav className="shelf" aria-label="קטגוריות">
+          {CAT_KEYS.map(k => {
+            const list = (items || []).filter(l => l.category === k);
+            const min = list.length ? Math.min(...list.map(l => l.price)) : null;
+            const next = list.length ? list.reduce((a, l) => (l.starts_on < a ? l.starts_on : a), list[0].starts_on) : null;
+            return (
+              <Link key={k} href={`/search/?cat=${k}`} className={`cat ${!list.length ? 'empty-cat' : ''}`} style={{ '--h': CAT_HUE[k] }}>
+                <span className="cat-ico"><Glyph cat={k} size={26} /></span>
+                <span className="cat-nm">{CATS[k].he}</span>
+                <span className="cat-info">
+                  {items === null ? '…' : list.length ? <>
+                    <span>החל מ-<b className="num">{ils(min)}</b></span>
+                    <span className="muted">הקרוב: {dShort(next)}</span>
+                  </> : <span className="muted">{CATS[k].soon ? 'בקרוב' : 'אין כרגע פריטים'}</span>}
+                </span>
+                {list.length > 0 && <span className="cat-count num">{list.length}</span>}
+              </Link>
+            );
+          })}
         </nav>
       </section>
 
