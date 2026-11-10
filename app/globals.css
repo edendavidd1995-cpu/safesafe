@@ -176,10 +176,26 @@ input[type=file]{padding:9px;background:var(--paper)}
 .fs .amt{font-family:var(--f-m);font-weight:600;font-size:17px;white-space:nowrap}
 .fs .amt.neg{color:var(--ink-3);font-size:14px}
 .flow-line{position:absolute;inset-inline-start:21px;top:36px;bottom:36px;width:2px;background:repeating-linear-gradient(to bottom,var(--ink) 0 4px,transparent 4px 8px)}
-.coin{position:absolute;inset-inline-start:15px;width:14px;height:14px;border-radius:50%;background:var(--signal);box-shadow:0 0 0 3px var(--card);z-index:2;animation:coin 6s cubic-bezier(.6,0,.3,1) infinite}
-@keyframes coin{0%,8%{top:30px}30%,62%{top:calc(50% - 7px)}84%,100%{top:calc(100% - 44px)}}
+/* money animation (8s): card swipe -> coin into vault ("נעול") -> buyer approves -> coin to last step */
+.coin{position:absolute;inset-inline-start:11px;top:25px;width:22px;height:22px;z-index:2;opacity:0;animation:coinmv 8s cubic-bezier(.55,0,.35,1) infinite}
+.coin i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#F7D67A,#E2A93B 60%,#B07A1C);color:#6B4A0F;font-style:normal;font-weight:800;font-size:11px;box-shadow:0 2px 4px rgba(0,0,0,.25);animation:coinspin 1.2s linear infinite}
+@keyframes coinspin{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.15)}}
+@keyframes coinmv{0%,8%{top:25px;opacity:0;transform:scale(.6)}11%{top:25px;opacity:1;transform:scale(1)}25%{top:calc(50% - 11px);opacity:1;transform:scale(1)}29%,64%{top:calc(50% - 11px);opacity:0;transform:scale(.3)}68%{top:calc(50% - 11px);opacity:1;transform:scale(1)}83%{top:calc(100% - 47px);opacity:1;transform:scale(1)}87%,100%{top:calc(100% - 47px);opacity:0;transform:scale(.3)}}
+.fs.first .fs-ico{animation:card 8s ease-in-out infinite}
+@keyframes card{0%,2%{transform:none;background:var(--paper)}5%{transform:translateX(-4px) rotate(-6deg);background:var(--signal-soft)}8%{transform:translateX(3px) rotate(4deg);background:var(--signal-soft)}11%,100%{transform:none;background:var(--paper)}}
+.fs.vaultrow .fs-ico{animation:vaultin 8s ease-out infinite}
+@keyframes vaultin{0%,27%{box-shadow:0 0 0 0 rgba(14,90,71,0);transform:none}30%{box-shadow:0 0 0 8px rgba(14,90,71,.22);transform:scale(1.1)}35%,64%{box-shadow:none;transform:none}67%{transform:scale(1.08)}71%,100%{transform:none}}
+.fs.last .fs-ico{animation:arrive 8s ease-out infinite}
+@keyframes arrive{0%,85%{background:var(--paper);color:var(--ink);border-color:var(--ink);box-shadow:none}88%{background:var(--vault);color:#fff;border-color:var(--vault);box-shadow:0 0 0 8px rgba(14,90,71,.22)}92%,97%{background:var(--vault);color:#fff;border-color:var(--vault);box-shadow:none}100%{background:var(--paper);color:var(--ink);border-color:var(--ink)}}
+.fs.last .amt{animation:amt 8s ease-out infinite}
+@keyframes amt{0%,86%{color:var(--ink)}89%,97%{color:var(--vault)}100%{color:var(--ink)}}
+.pill-anim{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;white-space:nowrap;opacity:0;justify-self:start}
+.pill-anim.lock{background:var(--vault);color:#fff;animation:plock 8s ease infinite}
+@keyframes plock{0%,27%{opacity:0;transform:scale(.6)}30%{opacity:1;transform:scale(1.15)}33%,64%{opacity:1;transform:none}68%,100%{opacity:.25;transform:none}}
+.pill-anim.ok{margin-top:6px;background:var(--card);color:var(--vault);border:1.5px solid var(--vault);animation:pok 8s ease infinite}
+@keyframes pok{0%,48%{opacity:0;transform:translateY(4px)}52%{opacity:1;transform:scale(1.08)}55%,94%{opacity:1;transform:none}99%,100%{opacity:0}}
 .flow-foot{margin-top:16px;padding-top:14px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-2);display:flex;gap:8px;align-items:center;position:relative}
-@media (prefers-reduced-motion:reduce){.coin,.ledger-dot{animation:none}.btn,.ticket{transition:none}}
+@media (prefers-reduced-motion:reduce){.coin,.coin i,.ledger-dot,.fs .fs-ico,.fs .amt,.pill-anim{animation:none}.coin{opacity:0}.pill-anim{opacity:1}.btn,.ticket{transition:none}}
 @media (max-width:900px){.hero-grid{grid-template-columns:1fr;gap:32px}}
 
 /* explore: category tabs + live tickets */
