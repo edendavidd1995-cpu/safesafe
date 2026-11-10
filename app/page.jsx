@@ -61,13 +61,13 @@ export default function Home() {
 
       <section className="section wrap" aria-labelledby="now">
         <div className="section-head"><div><span className="kicker">מתעדכן בזמן אמת</span><h2 id="now">מה מוכרים עכשיו</h2></div></div>
-        <div className="explore" style={{ '--h': sel === 'all' ? 24 : CAT_HUE[sel] }}>
+        <div className={`explore ${sel === 'all' ? 'all' : ''}`} style={{ '--h': sel === 'all' ? 24 : CAT_HUE[sel] }}>
           <div className="ex-tabs" role="tablist" aria-label="קטגוריות">
             {['all', ...CAT_KEYS].map(k => {
               const list = k === 'all' ? (items || []) : (items || []).filter(l => l.category === k);
               const min = list.length ? Math.min(...list.map(l => l.price)) : null;
               return (
-                <button key={k} role="tab" aria-selected={sel === k} className={`ex-tab ${!list.length && items ? 'none' : ''}`} style={{ '--h': k === 'all' ? 24 : CAT_HUE[k] }} onClick={() => setSel(k)}>
+                <button key={k} role="tab" aria-selected={sel === k} className={`ex-tab ${k === 'all' ? 'all' : ''} ${!list.length && items ? 'none' : ''}`} style={{ '--h': k === 'all' ? 24 : CAT_HUE[k] }} onClick={() => setSel(k)}>
                   <span className="ex-ico">{k === 'all' ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="4" y="4" width="7" height="7" rx="1.5" /><rect x="13" y="4" width="7" height="7" rx="1.5" /><rect x="4" y="13" width="7" height="7" rx="1.5" /><rect x="13" y="13" width="7" height="7" rx="1.5" /></svg> : <Glyph cat={k} size={22} />}</span>
                   <span className="ex-nm">{k === 'all' ? 'הכל' : CATS[k].he}</span>
                   <span className="ex-sub">{items === null ? '…' : list.length ? <>{list.length} · מ-<b className="num">{ils(min)}</b></> : CATS[k]?.soon ? 'בקרוב' : 'אין כרגע'}</span>
@@ -83,7 +83,7 @@ export default function Home() {
               return <>
                 <div className="ex-head">
                   <div><b>{sel === 'all' ? 'הקרובים ביותר' : name}</b><span className="muted">{list.length ? ` · ${list.length} פריטים, ממוינים לפי תאריך` : ''}</span></div>
-                  {list.length > 0 && <Link href={sel === 'all' ? '/search/' : `/search/?cat=${sel}`} className="btn ghost sm">לכל ה{sel === 'all' ? 'פריטים' : name} ←</Link>}
+                  {list.length > 0 && <Link href={sel === 'all' ? '/search/' : `/search/?cat=${sel}`} className="btn ghost sm">{sel === 'all' ? 'לכל הפריטים' : `לכל הפריטים ב${name}`} ←</Link>}
                 </div>
                 {list.length ? <div className="tickets">{list.slice(0, 6).map(l => <Ticket key={l.id} l={l} seller={l.seller} />)}</div>
                   : <div className="empty">{CATS[sel]?.soon ? 'טיסות מתווספות בשלב הבא. כבר עכשיו אפשר לפרסם כרטיס טיסה שניתן להעברה.' : 'אין כרגע פריטים בקטגוריה הזו.'} <Link href="/sell/">יש לך משהו למכור?</Link></div>}

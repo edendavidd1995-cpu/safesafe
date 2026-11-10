@@ -197,6 +197,8 @@ input[type=file]{padding:9px;background:var(--paper)}
 .ex-tab[aria-selected="true"] .ex-ico{background:rgba(255,255,255,.18);color:#fff}
 .ex-tab[aria-selected="true"] .ex-sub,.ex-tab[aria-selected="true"] .ex-sub b{color:rgba(255,255,255,.9)}
 .ex-tab.none{opacity:.6}
+.explore.all,.ex-tab.all{--c:var(--ink);--cs:var(--paper-2)}
+.ex-tab.all[aria-selected="true"] .ex-ico{color:var(--paper)}
 .ex-panel{background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--c);border-radius:0 0 14px 14px;padding:22px;position:relative;animation:exin .28s ease-out}
 @keyframes exin{from{opacity:0;transform:translateY(6px)}}
 .ex-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
