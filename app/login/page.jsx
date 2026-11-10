@@ -1,0 +1,65 @@
+'use client';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { sb, errText } from '@/lib/supabase';
+import { useApp } from '@/components/App';
+import { Loading, Mark } from '@/components/Bits';
+
+export default function Page() { return <Suspense fallback={<Loading />}><Login /></Suspense>; }
+
+function Login() {
+  const { user, toast } = useApp();
+  const router = useRouter();
+  const next = useSearchParams().get('next') || '/me/';
+  const [mode, setMode] = useState('in');
+  const [f, setF] = useState({ name: '', email: '', pass: '' });
+  const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  useEffect(() => { if (user) router.replace(next); }, [user, next, router]);
+  const set = k => e => setF({ ...f, [k]: e.target.value });
+
+  const submit = async e => {
+    e.preventDefault(); setErr('');
+    if (!/^\S+@\S+\.\S+$/.test(f.email)) return setErr('כתובת האימייל לא תקינה');
+    if (f.pass.length < 6) return setErr('הסיסמה צריכה להיות באורך 6 תווים לפחות');
+    setBusy(true);
+    if (mode === 'up') {
+      if (f.name.trim().split(/\s+/).length < 2) { setBusy(false); return setErr('צריך שם פרטי ושם משפחה'); }
+      const redirect = location.origin + (process.env.NEXT_PUBLIC_BASE || '') + '/me/';
+      const { data, error } = await sb.auth.signUp({ email: f.email.trim(), password: f.pass, options: { data: { display_name: f.name.trim() }, emailRedirectTo: redirect } });
+      setBusy(false);
+      if (error) return setErr(errText(error));
+      if (!data.session) return setSent(true);
+      toast('החשבון נפתח', 'ok');
+    } else {
+      const { error } = await sb.auth.signInWithPassword({ email: f.email.trim(), password: f.pass });
+      setBusy(false);
+      if (error) return setErr(errText(error));
+      toast('התחברת', 'ok');
+    }
+  };
+
+  if (sent) return (
+    <div className="wrap auth"><div className="card"><h1 style={{ fontSize: 30 }}>בדקו את המייל</h1><p className="muted">שלחנו קישור לאישור החשבון ל-<span dir="ltr">{f.email}</span>. אחרי האישור תחזרו לכאן מחוברים.</p></div></div>
+  );
+
+  return (
+    <div className="wrap auth">
+      <form className="card" onSubmit={submit} noValidate>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}><Mark size={38} /><h1 style={{ fontSize: 30 }}>{mode === 'in' ? 'כניסה' : 'פתיחת חשבון'}</h1></div>
+        <div className="tabs2" role="group" aria-label="סוג פעולה">
+          <button type="button" aria-pressed={mode === 'in'} onClick={() => { setMode('in'); setErr(''); }}>יש לי חשבון</button>
+          <button type="button" aria-pressed={mode === 'up'} onClick={() => { setMode('up'); setErr(''); }}>חשבון חדש</button>
+        </div>
+        {mode === 'up' && <div className="field"><label htmlFor="n">שם מלא, כמו בתעודה</label><input id="n" autoComplete="name" value={f.name} onChange={set('name')} /></div>}
+        <div className="field"><label htmlFor="e">אימייל</label><input id="e" type="email" dir="ltr" autoComplete="email" value={f.email} onChange={set('email')} /></div>
+        <div className="field"><label htmlFor="p">סיסמה</label><input id="p" type="password" dir="ltr" autoComplete={mode === 'in' ? 'current-password' : 'new-password'} value={f.pass} onChange={set('pass')} /></div>
+        <div className="err" role="alert">{err}</div>
+        <button className="btn lg block" disabled={busy}>{busy ? 'רגע…' : mode === 'in' ? 'כניסה' : 'פתיחת חשבון'}</button>
+        <p className="muted" style={{ fontSize: 13 }}>בפתיחת חשבון את/ה מאשר/ת את כללי הפלטפורמה. פרטים אישיים ומסמכים נשמרים מוצפנים ונגישים רק לך ולצוות הבדיקה.</p>
+      </form>
+    </div>
+  );
+}
