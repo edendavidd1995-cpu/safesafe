@@ -41,14 +41,6 @@ export default function Home() {
               <input type="search" placeholder="עיר, מלון, הופעה, קבוצה…" value={q} onChange={e => setQ(e.target.value)} aria-label="חיפוש" />
               <button className="btn signal" type="submit">חיפוש</button>
             </form>
-            <nav className="hchips" aria-label="קטגוריות">
-              <Link href="/search/" className="hchip all"><span className="hchip-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><rect x="4" y="4" width="7" height="7" rx="1.5" /><rect x="13" y="4" width="7" height="7" rx="1.5" /><rect x="4" y="13" width="7" height="7" rx="1.5" /><rect x="13" y="13" width="7" height="7" rx="1.5" /></svg></span>הכל{items && <i className="num">{items.length}</i>}</Link>
-              {CAT_KEYS.map(k => (
-                <Link key={k} href={`/search/?cat=${k}`} className="hchip" style={{ '--h': CAT_HUE[k] }}>
-                  <span className="hchip-ico"><Glyph cat={k} size={15} /></span>{CATS[k].he}{items && counts[k] > 0 && <i className="num">{counts[k]}</i>}
-                </Link>
-              ))}
-            </nav>
             <div className="hero-proof">
               <span><Check />כל מוכר מאמת תעודה מזהה</span>
               <span><Check />כל מסמך נבדק ידנית</span>
