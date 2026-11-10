@@ -49,18 +49,16 @@ export function Guilloche({ seed = 'x', className = '', lines = 18 }) {
   return <svg className={`guilloche ${className}`} viewBox="0 0 240 240" aria-hidden="true" fill="none" strokeWidth=".45">{paths}</svg>;
 }
 
-export function Stamp({ text = 'נבדק · מסמך מקורי · SafeSafe ·', small }) {
+export function Stamp({ small }) {
   return (
     <svg className={`stamp ${small ? 'sm' : ''}`} viewBox="0 0 120 120" aria-label="המסמך נבדק על ידי הצוות" role="img">
-      <defs>
-        <path id="stampc" d="M60 60 m-44 0 a44 44 0 1 1 88 0 a44 44 0 1 1 -88 0" />
-        <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" /><feDisplacementMap in="SourceGraphic" scale="2.4" /></filter>
-      </defs>
+      <defs><filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" /><feDisplacementMap in="SourceGraphic" scale="2.4" /></filter></defs>
       <g filter="url(#rough)" fill="none" stroke="currentColor">
         <circle cx="60" cy="60" r="56" strokeWidth="3" />
-        <circle cx="60" cy="60" r="34" strokeWidth="1.5" />
-        <text fill="currentColor" stroke="none" fontSize="12.5" fontWeight="700" letterSpacing="1"><textPath href="#stampc" startOffset="0">{text}</textPath></text>
-        <path d="M45 61l10 10 20-22" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="60" cy="60" r="48" strokeWidth="1.2" strokeDasharray="3 3" />
+        <text x="60" y="34" textAnchor="middle" fill="currentColor" stroke="none" fontSize="10" fontWeight="700" letterSpacing="2" fontFamily="IBM Plex Mono, monospace">SAFESAFE</text>
+        <path d="M42 58l12 12 24-24" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+        <text x="60" y="96" textAnchor="middle" fill="currentColor" stroke="none" fontSize="17" fontWeight="700" fontFamily="IBM Plex Sans Hebrew, sans-serif">נבדק</text>
       </g>
     </svg>
   );
@@ -74,7 +72,7 @@ export function Ticket({ l, seller }) {
       <div className="t-main">
         <div className="t-code mono"><span className="t-cat"><Glyph cat={l.category} size={15} />{c.code}</span><span>№ {shortRef(l.id)}</span></div>
         <h3 className="t-title">{l.title}</h3>
-        <div className="t-meta"><span>{l.city}{l.region === 'abroad' ? `, ${l.country}` : ''}</span><span className="mono">{dateRange(l)}</span></div>
+        <div className="t-meta"><span>{l.city}{l.region === 'abroad' ? `, ${l.country}` : ''}</span><span className="num">{dateRange(l)}</span></div>
         <div className="t-perf" aria-hidden="true" />
         <div className="t-price">
           <span className="price mono">{ils(l.price)}</span>

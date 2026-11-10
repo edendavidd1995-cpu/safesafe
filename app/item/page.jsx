@@ -84,7 +84,7 @@ function Item() {
             <div className="cert-head">
               <div><span className="kicker" style={{ margin: 0 }}>תעודת הגנה · № {shortRef(l.id)}</span>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginTop: 6 }}><span className="mono" style={{ fontSize: 40, fontWeight: 600, lineHeight: 1 }}>{ils(l.price)}</span></div>
-                {l.original_price > l.price && <div className="meta" style={{ marginTop: 6 }}><s className="mono">{ils(l.original_price)}</s><span className="save mono">חוסכים {ils(l.original_price - l.price)} · {off(l)}%</span></div>}
+                {l.original_price > l.price && <div className="meta" style={{ marginTop: 6 }}><s className="mono">{ils(l.original_price)}</s><span className="save num">חוסכים {ils(l.original_price - l.price)} · {off(l)}%</span></div>}
               </div>
               {l.doc_verified && <Stamp />}
             </div>

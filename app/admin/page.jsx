@@ -132,7 +132,7 @@ function Review({ d, run, queue, idq }) {
       return (
         <article className="order" key={l.id}>
           <div className="order-head"><div><span className="kicker" style={{ margin: 0 }}>{CATS[l.category].one} · הוגש {ago(l.created_at)}</span><h3>{l.title}, {l.city}</h3>
-            <div className="meta"><span className="mono">{dateRange(l)}</span><span>{l.details}</span><span>מוכר: {s.display_name} · {s.sales_count} מכירות</span><span>נרכש: {l.provider}</span></div></div>
+            <div className="meta"><span className="num">{dateRange(l)}</span><span>{l.details}</span><span>מוכר: {s.display_name} · {s.sales_count} מכירות</span><span>נרכש: {l.provider}</span></div></div>
             <div className="actions"><span className="chip mono">{ils(l.price)}</span>{bad ? <span className="chip bad">{bad} בעיות</span> : <span className="chip ok">כל הבדיקות עברו</span>}{l.info_requested && <span className="chip warn">נשלחה בקשה למוכר</span>}</div></div>
           <ul className="ck">{ck.map((c, i) => <li key={i} className={c[0] ? 'y' : c[2] === 'i' ? 'i' : 'n'}><i>{c[0] ? '✓' : c[2] === 'i' ? 'i' : '✕'}</i>{!c[0] && c[3] ? c[3] : c[1]}</li>)}</ul>
           <DocLinks docs={docs} />
@@ -161,7 +161,7 @@ function Orders({ d, run }) {
         return <tr key={o.id}>
           <td><Link className="mono" href={`/order/?id=${o.id}`}>{o.ref}</Link></td>
           <td><b>{l?.title}</b><div className="muted" style={{ fontSize: 13 }}>{l?.city}</div></td>
-          <td className="mono">{l && dShort(l.starts_on)}</td>
+          <td className="num">{l && dShort(l.starts_on)}</td>
           <td>{o.buyer?.display_name} → {o.seller?.display_name}</td>
           <td className="mono">{ils(o.price)}</td>
           <td>{l && steps(l.category)[Math.min(o.step, 4)].t}</td>
@@ -217,7 +217,7 @@ function Users({ d, run }) {
       <thead><tr><th>משתמש</th><th>הצטרף</th><th>זהות</th><th>טלפון</th><th>מכירות</th><th>דירוג</th><th>מצב</th><th></th></tr></thead>
       <tbody>{list.map(u => <tr key={u.id}>
         <td><Link href={`/seller/?id=${u.id}`}><b>{u.display_name}</b></Link>{u.role === 'admin' && <span className="chip" style={{ marginInlineStart: 6 }}>מנהל</span>}<div className="muted" style={{ fontSize: 13 }}>{u.city}</div></td>
-        <td className="mono">{dShort(u.created_at)}</td>
+        <td className="num">{dShort(u.created_at)}</td>
         <td><span className={`chip ${{ verified: 'ok', pending: 'warn', rejected: 'bad' }[u.id_status] || ''}`}>{{ verified: 'מאומת', pending: 'בבדיקה', rejected: 'נדחה', none: 'לא הועלה' }[u.id_status]}</span></td>
         <td>{u.phone_verified ? '✓' : '—'}</td>
         <td className="mono">{u.sales_count}</td>

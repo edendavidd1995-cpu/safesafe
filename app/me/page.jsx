@@ -87,7 +87,7 @@ function OrderRow({ o, role }) {
   return (
     <div className="lrow">
       <span className="swatch" style={{ '--h': l.hue }}><Glyph cat={l.category} /></span>
-      <div className="grow"><b>{l.title}</b><span className="meta"><span>{role === 'buyer' ? 'רכישה' : 'מכירה'}</span><span className="mono">{dateRange(l)}</span><span>{steps(l.category)[Math.min(o.step, 4)].t}</span></span></div>
+      <div className="grow"><b>{l.title}</b><span className="meta"><span>{role === 'buyer' ? 'רכישה' : 'מכירה'}</span><span className="num">{dateRange(l)}</span><span>{steps(l.category)[Math.min(o.step, 4)].t}</span></span></div>
       <div className="end"><span className={`chip ${st.tone}`}>{st.t}</span><b className="mono">{ils(role === 'seller' ? o.seller_payout : o.price)}</b><Link className="btn sm ghost" href={`/order/?id=${o.id}`}>פרטים</Link></div>
     </div>
   );
@@ -115,7 +115,7 @@ function Listings({ d, reload }) {
       return (
         <div className="lrow" key={l.id}>
           <span className="swatch" style={{ '--h': l.hue }}><Glyph cat={l.category} /></span>
-          <div className="grow"><Link href={`/item/?id=${l.id}`} style={{ fontWeight: 700, textDecoration: 'none' }}>{l.title}</Link><span className="meta"><span>{CATS[l.category].one}</span><span className="mono">{dateRange(l)}</span></span>
+          <div className="grow"><Link href={`/item/?id=${l.id}`} style={{ fontWeight: 700, textDecoration: 'none' }}>{l.title}</Link><span className="meta"><span>{CATS[l.category].one}</span><span className="num">{dateRange(l)}</span></span>
             <div className="actions"><span className={`chip ${tone}`}>{t}</span>{l.flags?.map(f => <span key={f} className="chip bad">{FLAG_HE[f] || f}</span>)}</div></div>
           <div className="end">{editable ? <>
             <input type="number" aria-label="מחיר" className="mono" style={{ width: 110, minHeight: 38 }} value={prices[l.id] ?? l.price} onChange={e => setPrices({ ...prices, [l.id]: e.target.value })} />
@@ -156,7 +156,7 @@ function Wallet({ d }) {
           <button className="btn" style={{ justifySelf: 'start' }} onClick={save}>שמירה</button></>}
     </section>
     <section className="card"><h3 style={{ marginBottom: 8 }}>תשלומים שהתקבלו</h3>
-      {done.length ? <div className="rows">{done.map(o => <div className="lrow" key={o.id}><div className="grow"><b>{o.listing.title}</b><span className="muted mono">{dShort(o.released_at)} · מחיר {ils(o.price)} · עמלה {ils(o.fee)}</span></div><b className="mono">{ils(o.seller_payout)}</b></div>)}</div> : <p className="muted">עוד לא התקבלו תשלומים.</p>}
+      {done.length ? <div className="rows">{done.map(o => <div className="lrow" key={o.id}><div className="grow"><b>{o.listing.title}</b><span className="muted num">{dShort(o.released_at)} · מחיר {ils(o.price)} · עמלה {ils(o.fee)}</span></div><b className="mono">{ils(o.seller_payout)}</b></div>)}</div> : <p className="muted">עוד לא התקבלו תשלומים.</p>}
     </section>
   </>;
 }

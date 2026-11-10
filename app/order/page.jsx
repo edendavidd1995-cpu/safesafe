@@ -76,7 +76,7 @@ function Order() {
           <div className="order">
             <div className="order-head">
               <div><span className="kicker" style={{ margin: 0 }}>{CATS[l.category].one} · עסקה {o.ref}</span><h1 style={{ fontSize: 34, marginTop: 4 }}>{l.title}</h1>
-                <div className="meta"><span>{l.city}</span><span className="mono">{dateRange(l)}</span><span>{role === 'seller' ? `קונה: ${o.buyer?.display_name}` : `מוכר: ${o.seller?.display_name}`}</span><span>על שם: {o.buyer_name}</span></div></div>
+                <div className="meta"><span>{l.city}</span><span className="num">{dateRange(l)}</span><span>{role === 'seller' ? `קונה: ${o.buyer?.display_name}` : `מוכר: ${o.seller?.display_name}`}</span><span>על שם: {o.buyer_name}</span></div></div>
               <span className={`chip ${st.tone}`}>{st.t}</span>
             </div>
             <Rail order={o} cat={l.category} events={ev} />
