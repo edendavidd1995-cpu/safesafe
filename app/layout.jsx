@@ -1,5 +1,6 @@
 import './globals.css';
 import { AppProvider, Header, Footer } from '@/components/App';
+import { PalettePicker } from '@/components/PalettePicker';
 
 export const metadata = {
   title: 'SafeSafe · הזמנות וכרטיסים ביד שנייה, בהגנה מלאה',
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
           <Header />
           <main id="main">{children}</main>
           <Footer />
+          <PalettePicker />
         </AppProvider>
       </body>
     </html>
