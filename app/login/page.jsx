@@ -2,6 +2,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { SITE } from '@/lib/native';
 import { sb, errText } from '@/lib/supabase';
 import { useApp } from '@/components/App';
 import { Loading, Mark } from '@/components/Bits';
@@ -26,7 +27,7 @@ function Login() {
     if (!/^\S+@\S+\.\S+$/.test(f.email)) return setErr('כתובת האימייל לא תקינה');
     if (mode === 'forgot') {
       setBusy(true);
-      const { error } = await sb.auth.resetPasswordForEmail(f.email.trim(), { redirectTo: location.origin + (process.env.NEXT_PUBLIC_BASE || '') + '/reset/' });
+      const { error } = await sb.auth.resetPasswordForEmail(f.email.trim(), { redirectTo: SITE + '/reset/' });
       setBusy(false);
       if (error) return setErr(errText(error));
       return setSent('reset');
@@ -35,7 +36,7 @@ function Login() {
     setBusy(true);
     if (mode === 'up') {
       if (f.name.trim().split(/\s+/).length < 2) { setBusy(false); return setErr('צריך שם פרטי ושם משפחה'); }
-      const redirect = location.origin + (process.env.NEXT_PUBLIC_BASE || '') + '/me/';
+      const redirect = SITE + '/me/';
       const { data, error } = await sb.auth.signUp({ email: f.email.trim(), password: f.pass, options: { data: { display_name: f.name.trim() }, emailRedirectTo: redirect } });
       setBusy(false);
       if (error) return setErr(errText(error));

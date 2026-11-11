@@ -1,15 +1,16 @@
 import './globals.css';
 import { AppProvider, Header, Footer } from '@/components/App';
+import { APP } from '@/lib/native';
 
 export const metadata = {
   title: 'SafeSafe · הזמנות וכרטיסים ביד שנייה, בהגנה מלאה',
   description: 'קונים ומוכרים הזמנות מלון, חופשות וכרטיסים שאי אפשר לנצל. הכסף נשמר בנאמנות ומשתחרר למוכר רק אחרי שהשתמשתם.',
 };
-export const viewport = { width: 'device-width', initialScale: 1, themeColor: '#5B3DF5' };
+export const viewport = { width: 'device-width', initialScale: 1, themeColor: '#5B3DF5', viewportFit: 'cover', ...(APP ? { maximumScale: 1, userScalable: false } : {}) };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="he" dir="rtl">
+    <html lang="he" dir="rtl" className={APP ? 'app' : undefined}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

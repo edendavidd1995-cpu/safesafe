@@ -1,10 +1,11 @@
 'use client';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, Suspense, useCallback, useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { sb } from '@/lib/supabase';
 import { ils, num, initials } from '@/lib/util';
 import { Mark } from './Bits';
+import { APP, initNative, registerPush, tap, lockEnabled, unlock, onResumeAfter } from '@/lib/native';
 
 const Ctx = createContext(null);
 export const useApp = () => useContext(Ctx);
@@ -17,6 +18,9 @@ export function AppProvider({ children }) {
   const [stats, setStats] = useState(null);
   const [settings, setSettings] = useState(null);
   const [unread, setUnread] = useState(0);
+  const router = useRouter();
+  useEffect(() => { initNative(p => router.push(p)); }, [router]);
+  useEffect(() => { if (session?.user?.id) registerPush(session.user.id, p => router.push(p)); }, [session, router]);
 
   const loadProfile = useCallback(async (uid) => {
     if (!uid) { setProfile(null); setPriv(null); return; }
@@ -59,6 +63,7 @@ export function AppProvider({ children }) {
   return (
     <Ctx.Provider value={{ session, user: session === undefined ? undefined : (session?.user || null), profile, priv, refreshProfile, toast, stats, refreshStats, settings, setSettings, unread, refreshUnread, isAdmin: profile?.role === 'admin' }}>
       {children}
+      {APP && <AppLock />}
       <div className="toasts" aria-live="polite">{toasts.map(t => <div key={t.id} className={`toast ${t.tone}`}>{t.msg}</div>)}</div>
     </Ctx.Provider>
   );
@@ -70,7 +75,7 @@ export function Header() {
   const on = p => (path === p || path === p + '/' || (p !== '/' && path.startsWith(p))) ? 'page' : undefined;
   return (
     <>
-      <div className="ledger" role="note">
+      {!APP && <div className="ledger" role="note">
         <div className="wrap ledger-in">
           <span className="ledger-dot" aria-hidden="true" />
           <span>מוחזק כרגע בנאמנות <b className="mono">{stats ? ils(stats.in_escrow) : '—'}</b></span>
@@ -80,7 +85,7 @@ export function Header() {
           <span className="hide-sm">הכסף עובר למוכר רק אחרי שהשתמשתם</span>
           <span className="ledger-demo">גרסת הדגמה · התשלום מדומה</span>
         </div>
-      </div>
+      </div>}
       <header className="top">
         <div className="wrap top-in">
           <Link href="/" className="brand" aria-label="SafeSafe, דף הבית"><Mark /><span className="brand-word" dir="ltr">Safe<i>Safe</i></span></Link>
@@ -90,7 +95,7 @@ export function Header() {
             {isAdmin && <Link href="/admin/" aria-current={on('/admin')} className="nav-admin">ניהול</Link>}
           </nav>
           <div className="top-end">
-            <Link href="/sell/" className="btn btn-sell">מכירה</Link>
+            {!APP && <Link href="/sell/" className="btn btn-sell">מכירה</Link>}
             {user === null || user === undefined
               ? <Link href="/login/" className="who-login">כניסה</Link>
               : <>
@@ -108,6 +113,7 @@ export function Header() {
 }
 
 export function Footer() {
+  if (APP) return <TabBar />;
   return (
     <footer className="foot">
       <div className="wrap foot-in">
@@ -124,5 +130,64 @@ export function Footer() {
         <span className="mono">© 2026 SafeSafe</span>
       </div>
     </footer>
+  );
+}
+
+const TABS = [
+  ['/', 'בית', <path key="h" d="M4 11.5 12 5l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1z" />],
+  ['/search/', 'חיפוש', <><circle key="a" cx="11" cy="11" r="6.5" /><path key="b" d="m20 20-4.2-4.2" /></>],
+  ['/sell/', 'מכירה', null],
+  ['/me/?tab=buys', 'עסקאות', <><rect key="a" x="5" y="4" width="14" height="16" rx="2.5" /><path key="b" d="M9 9h6M9 13h6M9 17h3" /></>],
+  ['/me/', 'החשבון', <><circle key="a" cx="12" cy="9" r="3.6" /><path key="b" d="M5 20c1.2-3.6 4-5.2 7-5.2s5.8 1.6 7 5.2" /></>],
+];
+
+function TabBarInner() {
+  const path = usePathname() || '/';
+  const tab = useSearchParams()?.get('tab');
+  const isOn = href => {
+    if (href === '/') return path === '/';
+    if (href === '/me/?tab=buys') return path.startsWith('/me') && (tab === 'buys' || tab === 'sales') || path.startsWith('/order');
+    if (href === '/me/') return path.startsWith('/me') && tab !== 'buys' && tab !== 'sales';
+    return path.startsWith(href.replace(/\/$/, ''));
+  };
+  return (
+    <nav className="tabbar" aria-label="ניווט ראשי">
+      {TABS.map(([href, label, icon]) => icon === null
+        ? <Link key={href} href={href} className="tb-sell" onClick={tap} aria-current={isOn(href) ? 'page' : undefined}>
+            <span className="tb-plus" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg></span>
+            <span>{label}</span>
+          </Link>
+        : <Link key={href} href={href} onClick={tap} aria-current={isOn(href) ? 'page' : undefined}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{icon}</svg>
+            <span>{label}</span>
+          </Link>)}
+    </nav>
+  );
+}
+
+function TabBar() { return <Suspense fallback={null}><TabBarInner /></Suspense>; }
+
+function AppLock() {
+  const [locked, setLocked] = useState(false);
+  const [err, setErr] = useState('');
+  const go = useCallback(async () => {
+    setErr('');
+    try { await unlock(); setLocked(false); } catch { setErr('לא נפתח. נסו שוב.'); }
+  }, []);
+  useEffect(() => {
+    if (lockEnabled()) { setLocked(true); go(); }
+    let off = () => {};
+    onResumeAfter(60000, () => { if (lockEnabled()) { setLocked(true); go(); } }).then(f => { off = f; });
+    return () => off();
+  }, [go]);
+  if (!locked) return null;
+  return (
+    <div className="applock" role="dialog" aria-modal="true" aria-label="האפליקציה נעולה">
+      <Mark />
+      <b dir="ltr" className="brand-word">Safe<i>Safe</i></b>
+      <p>האפליקציה נעולה</p>
+      <button className="btn lg" onClick={go}>פתיחה</button>
+      {err && <small>{err}</small>}
+    </div>
   );
 }

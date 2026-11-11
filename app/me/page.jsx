@@ -8,6 +8,7 @@ import { useApp } from '@/components/App';
 import { Loading, Empty, Glyph } from '@/components/Bits';
 import { IdUpload } from '@/components/IdUpload';
 import { PhoneVerify } from '@/components/PhoneVerify';
+import { unregisterPush, APP, biometry, lockEnabled, setLockEnabled, unlock } from '@/lib/native';
 
 const TABS = [['overview', 'סקירה'], ['notifications', 'התראות'], ['listings', 'המודעות שלי'], ['buys', 'הרכישות שלי'], ['sales', 'המכירות שלי'], ['wallet', 'ארנק'], ['profile', 'פרופיל ואימות'], ['support', 'צ׳אט תמיכה']];
 
@@ -37,7 +38,7 @@ function Me() {
   d.buys.filter(o => live(o) && !o.frozen && [1, 2, 3].includes(o.step)).forEach(o => todos.push([`${o.listing.title}: ${['', 'לאשר שההזמנה רשומה על שמך', 'לאשר צ׳ק-אין או כניסה', 'לשחרר את הכסף למוכר'][o.step]}`, o.id]));
   const count = { listings: d.listings.filter(l => ['active', 'pending_review'].includes(l.status)).length, buys: d.buys.filter(live).length, sales: d.sales.filter(live).length, overview: todos.length, notifications: unread };
 
-  const logout = async () => { await sb.auth.signOut(); toast('התנתקת'); router.push('/'); };
+  const logout = async () => { await unregisterPush(); await sb.auth.signOut(); toast('התנתקת'); router.push('/'); };
 
   return (
     <div className="wrap dash">
@@ -178,6 +179,7 @@ function Profile() {
     <section className="card stack"><h3>טלפון</h3>
       {profile.phone_verified ? <div className="banner ok"><span><b dir="ltr">{priv?.phone}</b> · מאומת. עדכוני עסקאות יגיעו לכאן.</span></div> : <PhoneVerify />}
     </section>
+    {APP && <LockSetting />}
     <section className="card stack"><h3>פרטים</h3>
       <div className="row2"><div className="field"><label htmlFor="dn">שם שמוצג לאחרים</label><input id="dn" value={f.display_name} onChange={e => setF({ ...f, display_name: e.target.value })} /></div><div className="field"><label htmlFor="ln">שם מלא כמו בתעודה (פרטי)</label><input id="ln" value={f.legal_name} onChange={e => setF({ ...f, legal_name: e.target.value })} /></div></div>
       <div className="row2"><div className="field"><label htmlFor="ct">עיר</label><input id="ct" value={f.city} onChange={e => setF({ ...f, city: e.target.value })} /></div><div className="field"><label htmlFor="em">אימייל</label><input id="em" dir="ltr" value={priv?.email || ''} disabled /></div></div>
@@ -186,6 +188,21 @@ function Profile() {
       <Link href={`/seller/?id=${profile.id}`} className="link">איך הפרופיל שלי נראה לאחרים</Link>
     </section>
   </>;
+}
+
+function LockSetting() {
+  const { toast } = useApp();
+  const [bio, setBio] = useState(null);
+  const [on, setOn] = useState(lockEnabled());
+  useEffect(() => { biometry().then(setBio); }, []);
+  if (!bio?.available) return null;
+  const flip = async () => {
+    try { await unlock(); setLockEnabled(!on); setOn(!on); toast(on ? 'הנעילה בוטלה' : `האפליקציה תינעל עם ${bio.name}`, 'ok'); } catch {}
+  };
+  return <section className="card stack"><h3>נעילה עם {bio.name}</h3>
+    <p className="muted">כשהאפליקציה נפתחת, או חוזרת אחרי יותר מדקה ברקע, היא תבקש {bio.name}.</p>
+    <button className={`btn ${on ? 'ghost' : ''}`} style={{ justifySelf: 'start' }} onClick={flip}>{on ? 'ביטול הנעילה' : `הפעלת ${bio.name}`}</button>
+  </section>;
 }
 
 function Support() {

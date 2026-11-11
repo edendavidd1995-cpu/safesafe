@@ -1,0 +1,16 @@
+{
+  "appId": "il.co.safesafe.app",
+  "appName": "SafeSafe",
+  "webDir": "out",
+  "backgroundColor": "#5B3DF5",
+  "ios": {
+    "contentInset": "never",
+    "scheme": "SafeSafe",
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "plugins": {
+    "SplashScreen": { "launchAutoHide": false, "launchShowDuration": 3000, "backgroundColor": "#5B3DF5", "showSpinner": false },
+    "StatusBar": { "style": "DARK", "overlaysWebView": true },
+    "PushNotifications": { "presentationOptions": ["badge", "sound", "alert"] }
+  }
+}

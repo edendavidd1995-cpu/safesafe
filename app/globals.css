@@ -518,3 +518,28 @@ details p{margin-top:8px}
 .top .mark line:last-of-type{stroke:var(--signal)}
 .top .mark circle:last-of-type{fill:var(--vault)}
 .top .avatar{background:#fff;color:var(--vault)}
+
+/* ===== iPhone app mode (html.app, only in the Capacitor build) ===== */
+html.app{-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+html.app body{overscroll-behavior-y:none;-webkit-user-select:none;user-select:none;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+html.app input,html.app textarea,html.app [contenteditable],html.app .prose,html.app .mono{-webkit-user-select:text;user-select:text}
+html.app .top{padding-top:env(safe-area-inset-top)}
+html.app .top-in{min-height:52px}
+html.app .nav,html.app .skip{display:none}
+html.app main{min-height:auto}
+html.app .toasts{bottom:calc(76px + env(safe-area-inset-bottom))}
+.tabbar{position:fixed;inset-inline:0;bottom:0;z-index:40;display:grid;grid-template-columns:repeat(5,1fr);
+  padding:6px 4px calc(4px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--card) 88%,transparent);
+  -webkit-backdrop-filter:saturate(1.8) blur(18px);backdrop-filter:saturate(1.8) blur(18px);border-top:1px solid var(--rule)}
+.tabbar a{display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--ink-3);font-size:11px;font-weight:500;padding:2px 0;min-height:48px;justify-content:center}
+.tabbar a[aria-current="page"]{color:var(--vault)}
+.tabbar a[aria-current="page"] svg{stroke-width:2.2}
+.tb-sell .tb-plus{width:44px;height:44px;margin-top:-18px;border-radius:15px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--vault) 80%,#fff),var(--vault));box-shadow:0 8px 18px -6px color-mix(in srgb,var(--vault) 70%,transparent),0 0 0 4px var(--paper)}
+.tb-sell[aria-current="page"] .tb-plus{background:linear-gradient(160deg,#4FE0BC,var(--signal))}
+.tabbar a:active svg,.tb-sell:active .tb-plus{transform:scale(.9)}
+.applock{position:fixed;inset:0;z-index:100;background:var(--vault);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px}
+.applock .mark{width:64px;height:64px}
+.applock .mark rect{fill:#fff}.applock .mark circle:first-of-type,.applock .mark line{stroke:var(--vault)}.applock .mark line:last-of-type{stroke:var(--signal)}.applock .mark circle:last-of-type{fill:var(--vault)}
+.applock .brand-word{font-size:30px}.applock .brand-word i{color:#fff;opacity:.75}
+.applock .btn{background:#fff;color:var(--vault);margin-top:12px}
