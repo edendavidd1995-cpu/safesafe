@@ -1,7 +1,7 @@
 /* SafeSafe — warm paper, ink, one escrow green, one signal red. Typeface: Rubik */
 :root{
-  --paper:#FFFFFF; --paper-2:#F1F1F8; --card:#F8F8FC; --ink:#1E1550; --ink-2:#5A5480; --ink-3:#9590B0;
-  --rule:#E5E5F0; --rule-2:#EEEEF5;
+  --paper:#F4F1FF; --paper-2:#EAE5FF; --card:#FFFFFF; --ink:#1E1550; --ink-2:#5A5480; --ink-3:#9590B0;
+  --rule:#E2DCFA; --rule-2:#ECE8FB;
   --vault:#5B3DF5; --vault-2:#4527D9; --vault-soft:#ECE8FF;
   --signal:#19C39B; --signal-soft:#D7F5EC;
   --warn:#9A5B00; --warn-soft:#F7EBD3;
@@ -134,7 +134,7 @@ input[type=file]{padding:9px;background:var(--paper)}
 @keyframes up{from{transform:translateY(10px);opacity:0}}
 
 /* ===== HERO ===== */
-.hero{padding-block:48px 40px;border-bottom:1px solid var(--rule);background:linear-gradient(180deg,color-mix(in srgb,var(--vault-soft) 70%,var(--paper)),var(--paper))}
+.hero{padding-block:48px 40px;border-bottom:1px solid var(--rule);background:linear-gradient(180deg,color-mix(in srgb,var(--vault) 16%,var(--paper)),var(--paper) 85%)}
 .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
 .hero h1{font-size:clamp(38px,5.6vw,70px);font-weight:800;line-height:1.05;letter-spacing:-.02em}
 .hero h1 em{font-style:normal;color:var(--vault);position:relative;white-space:nowrap}
