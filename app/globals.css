@@ -1,6 +1,6 @@
 /* SafeSafe — warm paper, ink, one escrow green, one signal red. Typeface: Rubik */
 :root{
-  --paper:#FFFFFF; --paper-2:#F1F1F8; --card:#F8F8FC; --ink:#0F1222; --ink-2:#555A72; --ink-3:#9095AB;
+  --paper:#FFFFFF; --paper-2:#F1F1F8; --card:#F8F8FC; --ink:#1E1550; --ink-2:#5A5480; --ink-3:#9590B0;
   --rule:#E5E5F0; --rule-2:#EEEEF5;
   --vault:#5B3DF5; --vault-2:#4527D9; --vault-soft:#ECE8FF;
   --signal:#19C39B; --signal-soft:#D7F5EC;
