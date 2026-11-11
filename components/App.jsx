@@ -57,7 +57,7 @@ export function AppProvider({ children }) {
   const refreshStats = useCallback(() => sb.rpc('trust_stats').then(({ data }) => data && setStats(data)), []);
 
   return (
-    <Ctx.Provider value={{ session, user: session?.user || null, profile, priv, refreshProfile, toast, stats, refreshStats, settings, setSettings, unread, refreshUnread, isAdmin: profile?.role === 'admin' }}>
+    <Ctx.Provider value={{ session, user: session === undefined ? undefined : (session?.user || null), profile, priv, refreshProfile, toast, stats, refreshStats, settings, setSettings, unread, refreshUnread, isAdmin: profile?.role === 'admin' }}>
       {children}
       <div className="toasts" aria-live="polite">{toasts.map(t => <div key={t.id} className={`toast ${t.tone}`}>{t.msg}</div>)}</div>
     </Ctx.Provider>
