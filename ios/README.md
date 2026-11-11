@@ -20,4 +20,4 @@ npm run app:open       # פותח את הפרויקט ב-Xcode
 
 ## התראות Push
 1. ב-developer.apple.com → Keys → מפתח חדש עם Apple Push Notifications service. מורידים את קובץ ה-p8.
-2. ב-Supabase → Edge Functions → Secrets: `APNS_KEY`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_BUNDLE_ID`, `APNS_ENV`, `PUSH_HOOK_SECRET`.
+2. ב-Supabase → Edge Functions → Secrets: `APNS_KEY`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `APNS_BUNDLE_ID`, `APNS_ENV`.

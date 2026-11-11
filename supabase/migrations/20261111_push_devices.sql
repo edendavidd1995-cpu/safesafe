@@ -57,3 +57,10 @@ revoke all on function public.notify_push() from public, anon, authenticated;
 drop trigger if exists notifications_push on public.notifications;
 create trigger notifications_push after insert on public.notifications
 for each row execute function public.notify_push();
+
+create or replace function public.check_push_secret(p_secret text)
+returns boolean language sql security definer set search_path = public as $$
+  select exists (select 1 from vault.decrypted_secrets where name = 'push_hook_secret' and decrypted_secret = p_secret);
+$$;
+revoke all on function public.check_push_secret(text) from public, anon, authenticated;
+grant execute on function public.check_push_secret(text) to service_role;

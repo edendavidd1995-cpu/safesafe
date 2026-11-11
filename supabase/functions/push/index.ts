@@ -2,7 +2,6 @@
 // Called by the database trigger `notifications_push` (see migrations/…_push_devices.sql).
 //
 // Secrets (set in Supabase → Edge Functions → Secrets once the Apple key exists):
-//   PUSH_HOOK_SECRET  same value as vault secret `push_hook_secret`
 //   APNS_KEY          contents of the AuthKey_XXXX.p8 file
 //   APNS_KEY_ID       the 10-character key id
 //   APNS_TEAM_ID      Apple developer team id
@@ -32,13 +31,16 @@ async function apnsJwt() {
 
 Deno.serve(async req => {
   if (req.method !== 'POST') return new Response('method', { status: 405 });
-  if (!env('PUSH_HOOK_SECRET') || req.headers.get('x-hook-secret') !== env('PUSH_HOOK_SECRET')) return new Response('forbidden', { status: 403 });
+  const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
+  // the caller must be our database trigger: it sends the vault secret, which only the DB can check
+  const hook = req.headers.get('x-hook-secret') ?? '';
+  const { data: ok } = hook ? await db.rpc('check_push_secret', { p_secret: hook }) : { data: false };
+  if (!ok) return new Response('forbidden', { status: 403 });
   if (!env('APNS_KEY') || !env('APNS_KEY_ID') || !env('APNS_TEAM_ID')) return Response.json({ skipped: 'apns not configured' });
 
   const { notification_id } = await req.json().catch(() => ({}));
   if (!notification_id) return new Response('bad request', { status: 400 });
 
-  const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
   const { data: n } = await db.from('notifications').select('id,user_id,title,body,link').eq('id', notification_id).maybeSingle();
   if (!n) return Response.json({ skipped: 'no notification' });
   const [{ data: devices }, { count }] = await Promise.all([
