@@ -163,11 +163,11 @@ input[type=file]{padding:9px;background:var(--paper)}
 
 /* the vault diagram */
 .flow{position:relative;background:var(--card);border:1px solid var(--rule);border-radius:var(--r2);padding:26px;overflow:hidden}
-.flow .guilloche{position:absolute;inset-inline-end:-90px;top:-90px;width:340px;stroke:var(--vault);opacity:.13;pointer-events:none}
 .flow-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:18px;position:relative}
 .flow-title b{font-family:var(--f-d);font-size:20px}
 .flow-steps{display:grid;gap:0;position:relative}
-.fs{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:14px 0;position:relative}
+.fs{display:grid;grid-template-columns:92px 1fr auto;gap:14px;align-items:center;padding:14px 0;position:relative}
+.fs>.fs-ico{justify-self:center}
 .fs+.fs{border-top:1px dashed var(--rule)}
 .fs-ico{width:44px;height:44px;border:1px solid var(--ink);border-radius:50%;display:grid;place-items:center;background:var(--paper);position:relative;z-index:1}
 .fs.vaultrow .fs-ico{background:var(--vault);border-color:var(--vault);color:#fff}
@@ -175,15 +175,20 @@ input[type=file]{padding:9px;background:var(--paper)}
 .fs small{color:var(--ink-2);font-size:14px;display:block;line-height:1.4}
 .fs .amt{font-family:var(--f-m);font-weight:600;font-size:17px;white-space:nowrap}
 .fs .amt.neg{color:var(--ink-3);font-size:14px}
-.flow-line{position:absolute;inset-inline-start:21px;top:36px;bottom:36px;width:2px;background:repeating-linear-gradient(to bottom,var(--ink) 0 4px,transparent 4px 8px)}
+.flow-line{position:absolute;inset-inline-start:45px;top:36px;bottom:36px;width:2px;background:repeating-linear-gradient(to bottom,var(--ink) 0 4px,transparent 4px 8px)}
 /* money animation (8s): card swipe -> coin into vault ("נעול") -> buyer approves -> coin to last step */
-.coin{position:absolute;inset-inline-start:11px;top:25px;width:22px;height:22px;z-index:2;opacity:0;animation:coinmv 8s cubic-bezier(.55,0,.35,1) infinite}
+.coin{position:absolute;inset-inline-start:35px;top:25px;width:22px;height:22px;z-index:2;opacity:0;animation:coinmv 8s cubic-bezier(.55,0,.35,1) infinite}
 .coin i{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#F7D67A,#E2A93B 60%,#B07A1C);color:#6B4A0F;font-style:normal;font-weight:800;font-size:11px;box-shadow:0 2px 4px rgba(0,0,0,.25);animation:coinspin 1.2s linear infinite}
 @keyframes coinspin{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.15)}}
 @keyframes coinmv{0%,8%{top:25px;opacity:0;transform:scale(.6)}11%{top:25px;opacity:1;transform:scale(1)}25%{top:calc(50% - 11px);opacity:1;transform:scale(1)}29%,64%{top:calc(50% - 11px);opacity:0;transform:scale(.3)}68%{top:calc(50% - 11px);opacity:1;transform:scale(1)}83%{top:calc(100% - 47px);opacity:1;transform:scale(1)}87%,100%{top:calc(100% - 47px);opacity:0;transform:scale(.3)}}
 .fs.first .fs-ico{animation:card 8s ease-in-out infinite}
 @keyframes card{0%,2%{transform:none;background:var(--paper)}5%{transform:translateX(-4px) rotate(-6deg);background:var(--signal-soft)}8%{transform:translateX(3px) rotate(4deg);background:var(--signal-soft)}11%,100%{transform:none;background:var(--paper)}}
-.fs.vaultrow .fs-ico{animation:vaultin 8s ease-out infinite}
+.vdoor{width:92px;height:92px;color:var(--vault);position:relative;z-index:1;background:var(--card);border-radius:18px;display:block}
+.vdoor svg{display:block}
+.vwheel{transform-origin:center;transform-box:fill-box;animation:vwheel 8s cubic-bezier(.6,0,.3,1) infinite}
+@keyframes vwheel{0%,28%{transform:rotate(0)}36%,64%{transform:rotate(200deg)}72%,100%{transform:rotate(0)}}
+.vdoor-glow{position:absolute;inset:0;border-radius:18px;animation:vglow 8s ease-out infinite}
+@keyframes vglow{0%,27%{box-shadow:0 0 0 0 transparent}31%{box-shadow:0 0 0 10px color-mix(in srgb,var(--vault) 20%,transparent)}40%,100%{box-shadow:0 0 0 0 transparent}}
 @keyframes vaultin{0%,27%{box-shadow:0 0 0 0 rgba(14,90,71,0);transform:none}30%{box-shadow:0 0 0 8px rgba(14,90,71,.22);transform:scale(1.1)}35%,64%{box-shadow:none;transform:none}67%{transform:scale(1.08)}71%,100%{transform:none}}
 .fs.last .fs-ico{animation:arrive 8s ease-out infinite}
 @keyframes arrive{0%,85%{background:var(--paper);color:var(--ink);border-color:var(--ink);box-shadow:none}88%{background:var(--vault);color:#fff;border-color:var(--vault);box-shadow:0 0 0 8px rgba(14,90,71,.22)}92%,97%{background:var(--vault);color:#fff;border-color:var(--vault);box-shadow:none}100%{background:var(--paper);color:var(--ink);border-color:var(--ink)}}
@@ -195,7 +200,7 @@ input[type=file]{padding:9px;background:var(--paper)}
 .pill-anim.ok{margin-top:6px;background:var(--card);color:var(--vault);border:1.5px solid var(--vault);animation:pok 8s ease infinite}
 @keyframes pok{0%,48%{opacity:0;transform:translateY(4px)}52%{opacity:1;transform:scale(1.08)}55%,94%{opacity:1;transform:none}99%,100%{opacity:0}}
 .flow-foot{margin-top:16px;padding-top:14px;border-top:1px solid var(--rule);font-size:13px;color:var(--ink-2);display:flex;gap:8px;align-items:center;position:relative}
-@media (prefers-reduced-motion:reduce){.coin,.coin i,.ledger-dot,.fs .fs-ico,.fs .amt,.pill-anim{animation:none}.coin{opacity:0}.pill-anim{opacity:1}.btn,.ticket{transition:none}}
+@media (prefers-reduced-motion:reduce){.vwheel,.vdoor-glow,.coin,.coin i,.ledger-dot,.fs .fs-ico,.fs .amt,.pill-anim{animation:none}.coin{opacity:0}.pill-anim{opacity:1}.btn,.ticket{transition:none}}
 @media (max-width:900px){.hero-grid{grid-template-columns:1fr;gap:32px}}
 
 /* categories accordion */
@@ -458,3 +463,5 @@ details p{margin-top:8px}
 .drop{border:1.5px dashed var(--rule);border-radius:var(--r2);padding:18px;display:grid;gap:8px;justify-items:start;background:var(--paper)}
 .drop.has{border-style:solid;border-color:var(--vault);background:var(--vault-soft)}
 
+
+@media (max-width:420px){.fs{grid-template-columns:72px 1fr auto;gap:10px}.vdoor,.vdoor svg{width:72px;height:72px}.flow-line{inset-inline-start:35px}.coin{inset-inline-start:25px}}
