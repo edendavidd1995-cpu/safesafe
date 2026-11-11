@@ -40,7 +40,7 @@ p{margin:0}
 main{min-height:60vh}
 
 /* ledger strip */
-.ledger{background:var(--ink);color:var(--paper);font-size:13px}
+.ledger{background:#150F3D;color:#E9E6FF;font-size:13px}
 .ledger-in{display:flex;align-items:center;gap:12px;min-height:34px;flex-wrap:wrap;padding-block:4px}
 .ledger b{font-weight:600;color:#fff}
 .ledger .sep{opacity:.35}
@@ -50,21 +50,21 @@ main{min-height:60vh}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ledger{background:#000}}
 
 /* header */
-.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.top{position:sticky;top:0;z-index:20;background:#1E1550;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 8px 24px -16px rgba(30,21,80,.6)}
 .top-in{display:flex;align-items:center;gap:20px;min-height:64px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand-word{font-family:var(--f-d);font-weight:900;font-size:25px;letter-spacing:-.03em}
 .brand-word i{font-style:normal;color:var(--vault)}
 .nav{display:flex;gap:2px}
-.nav a{padding:8px 12px;text-decoration:none;color:var(--ink-2);font-weight:500;border-bottom:2px solid transparent}
-.nav a[aria-current="page"]{color:var(--ink);border-color:var(--ink)}
-.nav a:hover{color:var(--ink)}
+.nav a{padding:8px 12px;text-decoration:none;color:#C9C3EE;font-weight:500;border-bottom:2px solid transparent}
+.nav a[aria-current="page"]{color:#fff;border-color:var(--signal)}
+.nav a:hover{color:#fff}
 .nav-admin{font-family:var(--f-m);font-size:14px}
 .top-end{margin-inline-start:auto;display:flex;gap:10px;align-items:center}
 .who-login{font-weight:600;text-decoration:none;padding:8px 6px}
 .avatar{width:36px;height:36px;border-radius:50%;background:var(--vault);color:var(--paper);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
 .avatar.lg{width:56px;height:56px;font-size:20px}
-.who[aria-current="page"] .avatar{box-shadow:0 0 0 2px var(--paper),0 0 0 4px var(--vault)}
+.who[aria-current="page"] .avatar{box-shadow:0 0 0 2px #1E1550,0 0 0 4px var(--signal)}
 @media (max-width:720px){.nav{display:none}.hide-sm{display:none}.brand-word{font-size:22px}.ledger-demo{display:none}}
 
 /* buttons */
@@ -478,3 +478,12 @@ details p{margin-top:8px}
 .acc-row.on .appicon{box-shadow:0 0 0 2px rgba(255,255,255,.55),0 6px 14px -6px rgba(0,0,0,.35)}
 .acc-row.none .appicon{filter:saturate(.35);opacity:.75}
 @media (max-width:640px){.acc-head .appicon{width:38px!important;height:38px!important}}
+
+/* dark header */
+.top .brand-word{color:#fff}
+.top .brand-word i{color:#9C8BFF}
+.top .who-login{color:#fff}
+.top .btn-sell{background:var(--signal);border-color:var(--signal);color:#0B3D30}
+.top .btn-sell:hover{background:#2AD6AC;border-color:#2AD6AC}
+.top .mark rect{filter:drop-shadow(0 0 0 rgba(0,0,0,0))}
+.top :focus-visible{outline-color:var(--signal)}
