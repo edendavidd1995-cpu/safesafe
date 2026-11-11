@@ -50,13 +50,13 @@ main{min-height:60vh}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ledger{background:#000}}
 
 /* header */
-.top{position:sticky;top:0;z-index:20;background:#1E1550;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 8px 24px -16px rgba(30,21,80,.6)}
+.top{position:sticky;top:0;z-index:20;background:var(--vault);color:#fff;border-bottom:1px solid rgba(255,255,255,.12);box-shadow:0 10px 26px -16px color-mix(in srgb,var(--vault) 70%,transparent)}
 .top-in{display:flex;align-items:center;gap:20px;min-height:64px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand-word{font-family:var(--f-d);font-weight:900;font-size:25px;letter-spacing:-.03em}
 .brand-word i{font-style:normal;color:var(--vault)}
 .nav{display:flex;gap:2px}
-.nav a{padding:8px 12px;text-decoration:none;color:#C9C3EE;font-weight:500;border-bottom:2px solid transparent}
+.nav a{padding:8px 12px;text-decoration:none;color:#E4DEFF;font-weight:500;border-bottom:2px solid transparent}
 .nav a[aria-current="page"]{color:#fff;border-color:var(--signal)}
 .nav a:hover{color:#fff}
 .nav-admin{font-family:var(--f-m);font-size:14px}
@@ -64,7 +64,7 @@ main{min-height:60vh}
 .who-login{font-weight:600;text-decoration:none;padding:8px 6px}
 .avatar{width:36px;height:36px;border-radius:50%;background:var(--vault);color:var(--paper);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
 .avatar.lg{width:56px;height:56px;font-size:20px}
-.who[aria-current="page"] .avatar{box-shadow:0 0 0 2px #1E1550,0 0 0 4px var(--signal)}
+.who[aria-current="page"] .avatar{box-shadow:0 0 0 2px var(--vault),0 0 0 4px var(--signal)}
 @media (max-width:720px){.nav{display:none}.hide-sm{display:none}.brand-word{font-size:22px}.ledger-demo{display:none}}
 
 /* buttons */
@@ -481,7 +481,7 @@ details p{margin-top:8px}
 
 /* dark header */
 .top .brand-word{color:#fff}
-.top .brand-word i{color:#9C8BFF}
+.top .brand-word i{color:#CFC5FF}
 .top .who-login{color:#fff}
 .top .btn-sell{background:var(--signal);border-color:var(--signal);color:#0B3D30}
 .top .btn-sell:hover{background:#2AD6AC;border-color:#2AD6AC}
@@ -491,7 +491,7 @@ details p{margin-top:8px}
 /* bell + notifications */
 .bell{position:relative;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;color:#fff;text-decoration:none}
 .bell:hover{background:rgba(255,255,255,.1)}
-.bell-n{position:absolute;top:2px;inset-inline-end:0;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--signal);color:#0B3D30;font-size:11px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px #1E1550}
+.bell-n{position:absolute;top:2px;inset-inline-end:0;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--signal);color:#0B3D30;font-size:11px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px var(--vault)}
 .notif-list{display:grid}
 .notif{display:grid;grid-template-columns:10px 1fr auto;gap:12px;align-items:start;padding:14px 4px;border-top:1px solid var(--rule-2);text-decoration:none;color:inherit}
 .notif:first-child{border-top:0}
@@ -510,3 +510,11 @@ details p{margin-top:8px}
 @media (max-width:760px){.foot-cols{grid-template-columns:1fr 1fr}}
 .legal h2{font-size:24px;margin:34px 0 10px}
 .legal ul{margin:0}
+
+/* violet header: invert the mark and avatar so they stay visible */
+.top .mark rect{fill:#fff}
+.top .mark circle:first-of-type{stroke:var(--vault)}
+.top .mark line{stroke:var(--vault)}
+.top .mark line:last-of-type{stroke:var(--signal)}
+.top .mark circle:last-of-type{fill:var(--vault)}
+.top .avatar{background:#fff;color:var(--vault)}
