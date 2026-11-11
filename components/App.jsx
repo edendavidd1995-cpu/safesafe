@@ -15,6 +15,8 @@ export function AppProvider({ children }) {
   const [priv, setPriv] = useState(null);
   const [toasts, setToasts] = useState([]);
   const [stats, setStats] = useState(null);
+  const [settings, setSettings] = useState(null);
+  const [unread, setUnread] = useState(0);
 
   const loadProfile = useCallback(async (uid) => {
     if (!uid) { setProfile(null); setPriv(null); return; }
@@ -29,6 +31,7 @@ export function AppProvider({ children }) {
     sb.auth.getSession().then(({ data }) => { setSession(data.session); loadProfile(data.session?.user?.id); });
     const { data: sub } = sb.auth.onAuthStateChange((_e, s) => { setSession(s); loadProfile(s?.user?.id); });
     sb.rpc('trust_stats').then(({ data }) => data && setStats(data));
+    sb.from('app_settings').select('fee_pct,fee_payer').eq('id', 1).maybeSingle().then(({ data }) => data && setSettings(data));
     return () => sub.subscription.unsubscribe();
   }, [loadProfile]);
 
@@ -39,10 +42,22 @@ export function AppProvider({ children }) {
   }, []);
 
   const refreshProfile = useCallback(() => loadProfile(session?.user?.id), [session, loadProfile]);
+  const refreshUnread = useCallback(async () => {
+    const uid = session?.user?.id; if (!uid) { setUnread(0); return; }
+    const { count } = await sb.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', uid).eq('read', false);
+    setUnread(count || 0);
+  }, [session]);
+  useEffect(() => {
+    const uid = session?.user?.id; if (!uid) { setUnread(0); return; }
+    refreshUnread();
+    const ch = sb.channel('notif-' + uid).on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${uid}` }, () => { refreshUnread(); }).subscribe();
+    const iv = setInterval(refreshUnread, 60000);
+    return () => { sb.removeChannel(ch); clearInterval(iv); };
+  }, [session, refreshUnread]);
   const refreshStats = useCallback(() => sb.rpc('trust_stats').then(({ data }) => data && setStats(data)), []);
 
   return (
-    <Ctx.Provider value={{ session, user: session?.user || null, profile, priv, refreshProfile, toast, stats, refreshStats, isAdmin: profile?.role === 'admin' }}>
+    <Ctx.Provider value={{ session, user: session?.user || null, profile, priv, refreshProfile, toast, stats, refreshStats, settings, setSettings, unread, refreshUnread, isAdmin: profile?.role === 'admin' }}>
       {children}
       <div className="toasts" aria-live="polite">{toasts.map(t => <div key={t.id} className={`toast ${t.tone}`}>{t.msg}</div>)}</div>
     </Ctx.Provider>
@@ -50,7 +65,7 @@ export function AppProvider({ children }) {
 }
 
 export function Header() {
-  const { user, profile, stats, isAdmin } = useApp();
+  const { user, profile, stats, isAdmin, unread } = useApp();
   const path = usePathname() || '/';
   const on = p => (path === p || path === p + '/' || (p !== '/' && path.startsWith(p))) ? 'page' : undefined;
   return (
@@ -78,7 +93,13 @@ export function Header() {
             <Link href="/sell/" className="btn btn-sell">מכירה</Link>
             {user === null || user === undefined
               ? <Link href="/login/" className="who-login">כניסה</Link>
-              : <Link href="/me/" className="who" aria-current={on('/me')} aria-label="האזור האישי"><span className="avatar">{initials(profile?.display_name)}</span></Link>}
+              : <>
+                <Link href="/me/?tab=notifications" className="bell" aria-label={unread ? `${unread} התראות חדשות` : 'התראות'}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></svg>
+                  {unread > 0 && <span className="bell-n">{unread > 9 ? '9+' : unread}</span>}
+                </Link>
+                <Link href="/me/" className="who" aria-current={on('/me')} aria-label="האזור האישי"><span className="avatar">{initials(profile?.display_name)}</span></Link>
+              </>}
           </div>
         </div>
       </header>
@@ -95,6 +116,7 @@ export function Footer() {
           <div><h4>קונים</h4><Link href="/search/">כל הפריטים</Link><Link href="/trust/">הגנת קונה</Link><Link href="/me/?tab=buys">הרכישות שלי</Link></div>
           <div><h4>מוכרים</h4><Link href="/sell/">פרסום פריט</Link><Link href="/trust/#rules">כללי פרסום</Link><Link href="/me/?tab=wallet">ארנק</Link></div>
           <div><h4>עזרה</h4><Link href="/me/?tab=support">צ׳אט תמיכה</Link><Link href="/trust/#faq">שאלות נפוצות</Link><Link href="/trust/#disputes">מחלוקות והחזרים</Link></div>
+          <div><h4>מידע משפטי</h4><Link href="/terms/">תקנון</Link><Link href="/privacy/">מדיניות פרטיות</Link><Link href="/accessibility/">הצהרת נגישות</Link></div>
         </div>
       </div>
       <div className="wrap foot-legal">

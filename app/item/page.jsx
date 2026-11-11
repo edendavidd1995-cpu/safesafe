@@ -3,7 +3,7 @@ import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { sb, errText } from '@/lib/supabase';
-import { CATS, ils, off, dLong, nights, shortRef, memberSince, initials, SELLER_COLS, daysUntil } from '@/lib/util';
+import { CATS, ils, off, dLong, nights, shortRef, memberSince, initials, SELLER_COLS, daysUntil, feeSplit } from '@/lib/util';
 import { useApp } from '@/components/App';
 import { Guilloche, Stamp, Glyph, Loading, Empty } from '@/components/Bits';
 import { PhoneVerify } from '@/components/PhoneVerify';
@@ -12,7 +12,7 @@ export default function Page() { return <Suspense fallback={<Loading />}><Item /
 
 function Item() {
   const id = useSearchParams().get('id');
-  const { user, profile, priv } = useApp();
+  const { user, profile, priv, settings } = useApp();
   const [l, setL] = useState(undefined);
   const [buying, setBuying] = useState(false);
 
@@ -25,6 +25,7 @@ function Item() {
   if (!l) return <div className="wrap" style={{ paddingTop: 40 }}><Empty>הפריט לא נמצא, או שכבר נמכר. <Link href="/search/">לכל הפריטים</Link></Empty></div>;
 
   const c = CATS[l.category], s = l.seller || {}, n = nights(l), mine = user && l.seller_id === user.id;
+  const bf = feeSplit(l.price, settings || undefined);
   const available = l.status === 'active' && daysUntil(l.starts_on) >= 0;
   const checks = [
     [s.id_status === 'verified', s.id_status === 'verified' ? 'תעודה מזהה של המוכר אומתה' : 'תעודה מזהה של המוכר בבדיקה'],
@@ -90,8 +91,8 @@ function Item() {
             </div>
             <div className="sum">
               {n > 0 && <div><span className="muted">מחיר ללילה</span><span className="mono">{ils(l.price / n)}</span></div>}
-              <div><span className="muted">עמלת שירות לקונה</span><span className="mono">₪0</span></div>
-              <div className="total"><span>סך הכול לתשלום</span><span className="mono">{ils(l.price)}</span></div>
+              <div><span className="muted">עמלת שירות לקונה{bf.buyer ? ` (${bf.buyerPct}%)` : ''}</span><span className="mono">{ils(bf.buyer)}</span></div>
+              <div className="total"><span>סך הכול לתשלום</span><span className="mono">{ils(l.price + bf.buyer)}</span></div>
             </div>
             {mine ? <Link href="/me/?tab=listings" className="btn ghost block">המודעה שלך · לניהול</Link>
               : available ? <button className="btn vault lg block" onClick={() => setBuying(true)}>רכישה מוגנת</button>
@@ -112,7 +113,8 @@ function Item() {
 
 function BuyModal({ l, onClose, user, profile, priv }) {
   const router = useRouter();
-  const { toast, refreshStats } = useApp();
+  const { toast, refreshStats, settings } = useApp();
+  const bf = feeSplit(l.price, settings || undefined);
   const [name, setName] = useState(priv?.legal_name || profile?.display_name || '');
   const [agree, setAgree] = useState(false);
   const [err, setErr] = useState('');
@@ -136,7 +138,7 @@ function BuyModal({ l, onClose, user, profile, priv }) {
     <div className="modal-bg" onMouseDown={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" role="dialog" aria-modal="true" aria-labelledby="bt">
         <h2 id="bt">רכישה מוגנת</h2>
-        <p className="muted">{l.title} · <span className="mono">{ils(l.price)}</span></p>
+        <p className="muted">{l.title} · <span className="mono">{ils(l.price + bf.buyer)}</span></p>
         {!user ? <>
           <p>כדי לקנות צריך חשבון. זה לוקח פחות מדקה.</p>
           <Link className="btn block" href={`/login/?next=${encodeURIComponent('/item/?id=' + l.id)}`}>כניסה או הרשמה</Link>
@@ -151,7 +153,7 @@ function BuyModal({ l, onClose, user, profile, priv }) {
           </div>
           <label className="check"><input type="checkbox" checked={agree} onChange={e => setAgree(e.target.checked)} /><span>הבנתי שהכסף יוחזק בנאמנות ויועבר למוכר רק אחרי {nights(l) ? 'הצ׳ק-אין' : 'האירוע'}, ושאפשר לבקש החזר אם הפריט לא הועבר לשמי.</span></label>
           <div className="err" role="alert">{err}</div>
-          <button className="btn vault lg block" onClick={pay} disabled={busy}>{busy ? 'מעבד…' : `תשלום ${ils(l.price)} לנאמנות`}</button>
+          <button className="btn vault lg block" onClick={pay} disabled={busy}>{busy ? 'מעבד…' : `תשלום ${ils(l.price + bf.buyer)} לנאמנות`}</button>
         </>}
         <button className="btn ghost block" onClick={onClose}>ביטול</button>
       </div>

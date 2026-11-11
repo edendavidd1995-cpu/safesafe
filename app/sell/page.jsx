@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { sb, errText, uploadDoc } from '@/lib/supabase';
-import { CATS, CAT_KEYS, ils, FEE } from '@/lib/util';
+import { CATS, CAT_KEYS, ils, feeSplit } from '@/lib/util';
 import { useApp } from '@/components/App';
 import { Glyph, Loading, Field } from '@/components/Bits';
 import { IdUpload } from '@/components/IdUpload';
@@ -11,7 +11,7 @@ import { IdUpload } from '@/components/IdUpload';
 const STAY = ['hotel', 'vacation', 'cruise'];
 
 export default function Sell() {
-  const { user, profile, toast } = useApp();
+  const { user, profile, toast, settings } = useApp();
   const router = useRouter();
   const [cat, setCat] = useState('hotel');
   const [f, setF] = useState({ title: '', venue: '', city: '', country: 'ישראל', region: 'il', starts_on: '', ends_on: '', quantity: 2, details: '', provider: '', original_price: '', price: '', reason: '' });
@@ -27,6 +27,7 @@ export default function Sell() {
   );
 
   const stay = STAY.includes(cat), p = +f.price || 0, o = +f.original_price || 0;
+  const fs = feeSplit(p, settings || undefined);
   const needId = ['none', 'rejected'].includes(profile.id_status);
 
   const submit = async e => {
@@ -52,7 +53,7 @@ export default function Sell() {
 
   return (
     <div className="wrap">
-      <div className="page-head"><span className="kicker">פרסום חינם · {FEE * 100}% עמלה רק כשנמכר</span><h1>מכירת הזמנה או כרטיס</h1></div>
+      <div className="page-head"><span className="kicker">פרסום חינם · עמלה רק כשנמכר</span><h1>מכירת הזמנה או כרטיס</h1></div>
       <div className="item" style={{ paddingTop: 0 }}>
         <form className="stack" onSubmit={submit} noValidate style={{ gap: 22 }}>
           <section className="card stack">
@@ -112,9 +113,9 @@ export default function Sell() {
             <span className="kicker" style={{ margin: 0 }}>כמה תקבלו</span>
             <div className="sum">
               <div><span className="muted">מחיר מבוקש</span><span className="mono">{ils(p)}</span></div>
-              <div><span className="muted">עמלת SafeSafe ({FEE * 100}%)</span><span className="mono">−{ils(p * FEE)}</span></div>
-              <div className="total"><span>לחשבון הבנק</span><span className="mono" style={{ color: 'var(--vault)' }}>{ils(p * (1 - FEE))}</span></div>
-              {o > 0 && p > 0 && <div><span className="muted">מתוך מה ששילמת</span><span className="mono">{Math.round(p * (1 - FEE) / o * 100)}%</span></div>}
+              <div><span className="muted">עמלת SafeSafe ({fs.sellerPct}%)</span><span className="mono">−{ils(fs.seller)}</span></div>
+              <div className="total"><span>לחשבון הבנק</span><span className="mono" style={{ color: 'var(--vault)' }}>{ils(p - fs.seller)}</span></div>
+              {o > 0 && p > 0 && <div><span className="muted">מתוך מה ששילמת</span><span className="mono">{Math.round((p - fs.seller) / o * 100)}%</span></div>}
             </div>
             <ul className="pledge-list">
               <li><span>01</span>הצוות בודק כל מודעה, בדרך כלל תוך כמה שעות</li>

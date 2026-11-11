@@ -3,11 +3,11 @@ import { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { sb, errText } from '@/lib/supabase';
-import { ils, num, dateRange, dShort, dTime, orderStatus, steps, CATS, ACTION_HE, FLAG_HE, off, daysUntil, initials, ago } from '@/lib/util';
+import { ils, num, dateRange, dShort, dTime, orderStatus, steps, CATS, ACTION_HE, FLAG_HE, off, daysUntil, initials, ago, feeSplit } from '@/lib/util';
 import { useApp } from '@/components/App';
 import { Loading, Empty, Glyph } from '@/components/Bits';
 
-const TABS = [['overview', 'סקירה'], ['review', 'מודעות לבדיקה'], ['orders', 'עסקאות'], ['disputes', 'מחלוקות'], ['users', 'משתמשים'], ['support', 'פניות תמיכה'], ['log', 'יומן פעולות']];
+const TABS = [['overview', 'סקירה'], ['review', 'מודעות לבדיקה'], ['listings', 'מודעות פעילות'], ['orders', 'עסקאות'], ['disputes', 'מחלוקות'], ['users', 'משתמשים'], ['support', 'פניות תמיכה'], ['log', 'יומן פעולות'], ['settings', 'הגדרות ועמלה']];
 const REJECT = ['האסמכתא לא תואמת לפרטים', 'הפריט לא ניתן להעברה לפי תנאי הספק', 'מחיר גבוה ממה ששולם', 'מסמך שכבר הועלה בעבר', 'חשד להונאה', 'פרטים חסרים'];
 
 export default function Page() { return <Suspense fallback={<Loading />}><Admin /></Suspense>; }
@@ -43,7 +43,7 @@ function Admin() {
   const unread = new Set(d.support.filter(m => !m.from_staff).map(m => m.thread_user));
   const lastStaff = {}; d.support.forEach(m => { if (m.from_staff) lastStaff[m.thread_user] = m.created_at; });
   const waiting = [...unread].filter(u => { const last = d.support.filter(m => m.thread_user === u).at(-1); return last && !last.from_staff; });
-  const cnt = { review: queue.length + idq.length, disputes: open.length, support: waiting.length, orders: d.orders.filter(o => flags(o).some(f => f[0] !== 'ok')).length };
+  const cnt = { listings: d.listings.filter(l => l.promoted && l.status === 'active').length, review: queue.length + idq.length, disputes: open.length, support: waiting.length, orders: d.orders.filter(o => flags(o).some(f => f[0] !== 'ok')).length };
   const ctx = { d, run, load, queue, open, idq, waiting };
 
   return (
@@ -60,6 +60,8 @@ function Admin() {
         {tab === 'users' && <Users {...ctx} />}
         {tab === 'support' && <SupportAdmin {...ctx} />}
         {tab === 'log' && <Log {...ctx} />}
+        {tab === 'listings' && <ActiveListings {...ctx} />}
+        {tab === 'settings' && <Settings />}
       </div>
     </div>
   );
@@ -260,5 +262,70 @@ function Log({ d }) {
     <h1>יומן פעולות</h1>
     <p className="muted" style={{ marginTop: -8 }}>כל פעולה במערכת נרשמת כאן. חשוב לשקיפות, וגם אם תהיה פנייה משפטית.</p>
     <section className="card"><div className="feed">{d.log.map(e => <div key={e.id} style={{ gridTemplateColumns: '120px 1fr' }}><time>{dTime(e.created_at)}</time><span><b>{ACTION_HE[e.action] || e.action}</b> · {e.detail}{e.actor ? <span className="muted"> · {e.actor.display_name}</span> : ''}</span></div>)}</div></section>
+  </>;
+}
+
+function ActiveListings({ d, run }) {
+  const [q, setQ] = useState('');
+  const today = new Date().toISOString().slice(0, 10);
+  const list = d.listings.filter(l => l.status === 'active' && l.starts_on >= today && (!q || (l.title + l.city).includes(q)))
+    .sort((a, b) => (b.promoted ? 1 : 0) - (a.promoted ? 1 : 0) || a.starts_on.localeCompare(b.starts_on));
+  return <>
+    <h1>מודעות פעילות</h1>
+    <p className="muted" style={{ marginTop: -8 }}>מודעה מקודמת מופיעה ראשונה בקטגוריה ובחיפוש, עם תווית "מקודם". זה הבסיס לשירות קידום בתשלום בעתיד.</p>
+    <input type="search" placeholder="חיפוש לפי שם או עיר" value={q} onChange={e => setQ(e.target.value)} style={{ maxWidth: 360 }} aria-label="חיפוש מודעה" />
+    <section className="card"><div className="tbl-wrap"><table className="tbl">
+      <thead><tr><th>מודעה</th><th>קטגוריה</th><th>תאריך</th><th>מוכר</th><th>מחיר</th><th>סטטוס</th><th></th></tr></thead>
+      <tbody>{list.map(l => <tr key={l.id}>
+        <td><Link href={`/item/?id=${l.id}`}><b>{l.title}</b></Link><div className="muted" style={{ fontSize: 13 }}>{l.city}</div></td>
+        <td>{CATS[l.category].he}</td>
+        <td className="num">{dShort(l.starts_on)}</td>
+        <td>{l.seller?.display_name}</td>
+        <td className="num">{ils(l.price)}</td>
+        <td><div className="actions">{l.promoted && <span className="chip vault">מקודם</span>}{l.doc_verified ? <span className="chip ok">מסמך נבדק</span> : <span className="chip warn">מסמך בבדיקה</span>}</div></td>
+        <td><div className="actions">
+          <button className="btn sm ghost" onClick={() => run('admin_promote_listing', { p_listing: l.id, p_on: !l.promoted }, l.promoted ? 'הקידום הוסר' : 'המודעה קודמה')}>{l.promoted ? 'הסרת קידום' : 'קידום'}</button>
+          <button className="btn sm danger" onClick={() => confirm(`להוריד את "${l.title}" מהאתר?`) && run('admin_review_listing', { p_listing: l.id, p_action: 'unpublish' }, 'המודעה הורדה')}>הורדה</button>
+        </div></td>
+      </tr>)}</tbody>
+    </table></div></section>
+  </>;
+}
+
+function Settings() {
+  const { settings, setSettings, toast } = useApp();
+  const [pct, setPct] = useState(settings?.fee_pct ?? 10);
+  const [payer, setPayer] = useState(settings?.fee_payer ?? 'seller');
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { if (settings) { setPct(settings.fee_pct); setPayer(settings.fee_payer); } }, [settings]);
+  const ex = feeSplit(1000, { fee_pct: pct, fee_payer: payer });
+  const save = async () => {
+    setBusy(true);
+    const { error } = await sb.rpc('admin_update_settings', { p_fee_pct: +pct, p_fee_payer: payer });
+    setBusy(false);
+    if (error) return toast(errText(error), 'bad');
+    setSettings({ fee_pct: +pct, fee_payer: payer }); toast('העמלה עודכנה', 'ok');
+  };
+  return <>
+    <h1>הגדרות ועמלה</h1>
+    <section className="card stack">
+      <h3>עמלת עסקה</h3>
+      <p className="muted">השינוי חל רק על עסקאות חדשות. עסקאות שכבר שולמו נשארות עם העמלה שהייתה בזמן התשלום.</p>
+      <div className="row2">
+        <div className="field"><label htmlFor="fp">אחוז עמלה</label><input id="fp" type="number" min="0" max="30" step="0.5" className="mono" value={pct} onChange={e => setPct(e.target.value)} /></div>
+        <div className="field"><label htmlFor="fw">מי משלם</label><select id="fw" value={payer} onChange={e => setPayer(e.target.value)}><option value="seller">המוכר</option><option value="buyer">הקונה</option><option value="split">חצי-חצי</option></select></div>
+      </div>
+      <div className="note">דוגמה לפריט במחיר ₪1,000: הקונה משלם <b className="num">{ils(1000 + ex.buyer)}</b>, המוכר מקבל <b className="num">{ils(1000 - ex.seller)}</b>, וההכנסה שלך <b className="num">{ils(ex.total)}</b>.</div>
+      <button className="btn" style={{ justifySelf: 'start' }} disabled={busy} onClick={save}>{busy ? 'שומר…' : 'שמירה'}</button>
+    </section>
+    <section className="card stack">
+      <h3>תהליכים אוטומטיים</h3>
+      <p className="muted">רצים כל 15 דקות, גם כשאף אחד לא מחובר:</p>
+      <ul className="vchecks">
+        <li><i>✓</i>המוכר לא העביר תוך 48 שעות מהתשלום: החזר מלא אוטומטי לקונה.</li>
+        <li><i>✓</i>התאריך עבר, ההעברה אומתה ולא דווחה בעיה: השימוש נרשם אוטומטית.</li>
+        <li><i>✓</i>24 שעות אחרי השימוש בלי מחלוקת: הכסף משתחרר למוכר (רק אם הזהות שלו אומתה).</li>
+      </ul>
+    </section>
   </>;
 }

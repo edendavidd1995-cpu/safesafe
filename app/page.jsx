@@ -3,19 +3,20 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { sb } from '@/lib/supabase';
-import { CATS, CAT_KEYS, ils, num, FEE, SELLER_COLS, dShort } from '@/lib/util';
+import { CATS, CAT_KEYS, ils, num, feeSplit, SELLER_COLS, dShort } from '@/lib/util';
 
 import { useApp } from '@/components/App';
 import { Ticket, Glyph, Guilloche, Loading, AppIcon, CAT_HUE } from '@/components/Bits';
 
 export default function Home() {
-  const { stats } = useApp();
+  const { stats, settings } = useApp();
   const router = useRouter();
   const [items, setItems] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [q, setQ] = useState('');
   const [calc, setCalc] = useState(2400);
   const [sel, setSel] = useState('hotel');
+  const fs = feeSplit(calc, settings || undefined);
 
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10);
@@ -55,7 +56,7 @@ export default function Home() {
         {items === null ? <Loading /> : (
           <div className="acc">
             {CAT_KEYS.map(k => {
-              const list = items.filter(l => l.category === k);
+              const list = items.filter(l => l.category === k).sort((a, b) => (b.promoted ? 1 : 0) - (a.promoted ? 1 : 0));
               const min = list.length ? Math.min(...list.map(l => l.price)) : null;
               const on = sel === k;
               return (
@@ -120,16 +121,16 @@ export default function Home() {
           <div style={{ position: 'relative' }}>
             <span className="kicker" style={{ color: 'rgba(255,255,255,.7)' }}>למוכרים</span>
             <h2>יש לך הזמנה שלא תנצל?</h2>
-            <p>במקום להפסיד את כל הסכום, מכרו אותה למי שכן יכול לנסוע. פרסום חינם, עמלה של {FEE * 100}% רק כשנמכר.</p>
+            <p>במקום להפסיד את כל הסכום, מכרו אותה למי שכן יכול לנסוע. פרסום חינם, ועמלה רק כשנמכר.</p>
             <Link href="/sell/" className="btn lg" style={{ marginTop: 22, background: '#F3EFE6', color: '#15171B', borderColor: '#F3EFE6' }}>פרסום פריט</Link>
           </div>
           <div className="calc">
             <label htmlFor="calc" style={{ fontWeight: 600 }}>מחיר מבוקש</label>
             <input id="calc" type="number" inputMode="numeric" min="0" value={calc} onChange={e => setCalc(e.target.value)} className="mono" />
             <div className="sum" style={{ margin: 0 }}>
-              <div><span className="muted">עמלת SafeSafe ({FEE * 100}%)</span><span className="mono">−{ils(calc * FEE)}</span></div>
+              <div><span className="muted">עמלת SafeSafe ({fs.sellerPct}%)</span><span className="mono">−{ils(fs.seller)}</span></div>
             </div>
-            <div className="out"><span>מגיע לחשבון שלך</span><b>{ils(calc * (1 - FEE))}</b></div>
+            <div className="out"><span>מגיע לחשבון שלך</span><b>{ils((+calc || 0) - fs.seller)}</b></div>
           </div>
         </div>
       </section>

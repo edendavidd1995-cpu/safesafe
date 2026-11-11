@@ -487,3 +487,26 @@ details p{margin-top:8px}
 .top .btn-sell:hover{background:#2AD6AC;border-color:#2AD6AC}
 .top .mark rect{filter:drop-shadow(0 0 0 rgba(0,0,0,0))}
 .top :focus-visible{outline-color:var(--signal)}
+
+/* bell + notifications */
+.bell{position:relative;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;color:#fff;text-decoration:none}
+.bell:hover{background:rgba(255,255,255,.1)}
+.bell-n{position:absolute;top:2px;inset-inline-end:0;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--signal);color:#0B3D30;font-size:11px;font-weight:700;display:grid;place-items:center;box-shadow:0 0 0 2px #1E1550}
+.notif-list{display:grid}
+.notif{display:grid;grid-template-columns:10px 1fr auto;gap:12px;align-items:start;padding:14px 4px;border-top:1px solid var(--rule-2);text-decoration:none;color:inherit}
+.notif:first-child{border-top:0}
+.notif:hover{background:var(--paper)}
+.notif-dot{width:8px;height:8px;border-radius:50%;margin-top:8px;background:transparent}
+.notif.new .notif-dot{background:var(--vault)}
+.notif-txt{display:grid;gap:2px;min-width:0}
+.notif-txt b{font-weight:600}
+.notif.new .notif-txt b{font-weight:700}
+.notif-txt span{color:var(--ink-2);font-size:14px;overflow-wrap:anywhere}
+.notif time{font-size:12px;color:var(--ink-3);white-space:nowrap}
+/* promoted */
+.t-promo{font-family:var(--f-t);font-size:11px;font-weight:700;letter-spacing:0;background:var(--vault);color:#fff;border-radius:999px;padding:1px 8px;margin-inline-end:auto}
+/* footer + legal */
+.foot-cols{grid-template-columns:repeat(4,1fr)}
+@media (max-width:760px){.foot-cols{grid-template-columns:1fr 1fr}}
+.legal h2{font-size:24px;margin:34px 0 10px}
+.legal ul{margin:0}

@@ -33,7 +33,7 @@ function Search() {
       && (!t || [l.title, l.city, l.country, l.venue, l.details].join(' ').toLowerCase().includes(t))
       && (!maxPrice || l.price <= +maxPrice) && (!verifiedOnly || l.doc_verified));
     const s = { soon: (a, b) => a.starts_on.localeCompare(b.starts_on), cheap: (a, b) => a.price - b.price, save: (a, b) => off(b) - off(a), new: (a, b) => b.created_at.localeCompare(a.created_at) }[sort];
-    return r.sort(s);
+    return r.sort((a, b) => ((b.promoted ? 1 : 0) - (a.promoted ? 1 : 0)) || s(a, b));
   }, [items, q, cat, region, sort, maxPrice, verifiedOnly]);
 
   return (

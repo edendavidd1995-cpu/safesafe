@@ -9,12 +9,12 @@ import { Loading, Empty, Glyph } from '@/components/Bits';
 import { IdUpload } from '@/components/IdUpload';
 import { PhoneVerify } from '@/components/PhoneVerify';
 
-const TABS = [['overview', 'סקירה'], ['listings', 'המודעות שלי'], ['buys', 'הרכישות שלי'], ['sales', 'המכירות שלי'], ['wallet', 'ארנק'], ['profile', 'פרופיל ואימות'], ['support', 'צ׳אט תמיכה']];
+const TABS = [['overview', 'סקירה'], ['notifications', 'התראות'], ['listings', 'המודעות שלי'], ['buys', 'הרכישות שלי'], ['sales', 'המכירות שלי'], ['wallet', 'ארנק'], ['profile', 'פרופיל ואימות'], ['support', 'צ׳אט תמיכה']];
 
 export default function Page() { return <Suspense fallback={<Loading />}><Me /></Suspense>; }
 
 function Me() {
-  const { user, profile, priv, toast } = useApp();
+  const { user, profile, priv, toast, unread } = useApp();
   const tab = useSearchParams().get('tab') || 'overview';
   const router = useRouter();
   const [d, setD] = useState(null);
@@ -35,7 +35,7 @@ function Me() {
   const todos = [];
   d.sales.filter(o => live(o) && !o.frozen && o.step === 0).forEach(o => todos.push([`להעביר את ${o.listing.title} לשם ${o.buyer_name}`, o.id]));
   d.buys.filter(o => live(o) && !o.frozen && [1, 2, 3].includes(o.step)).forEach(o => todos.push([`${o.listing.title}: ${['', 'לאשר שההזמנה רשומה על שמך', 'לאשר צ׳ק-אין או כניסה', 'לשחרר את הכסף למוכר'][o.step]}`, o.id]));
-  const count = { listings: d.listings.filter(l => ['active', 'pending_review'].includes(l.status)).length, buys: d.buys.filter(live).length, sales: d.sales.filter(live).length, overview: todos.length };
+  const count = { listings: d.listings.filter(l => ['active', 'pending_review'].includes(l.status)).length, buys: d.buys.filter(live).length, sales: d.sales.filter(live).length, overview: todos.length, notifications: unread };
 
   const logout = async () => { await sb.auth.signOut(); toast('התנתקת'); router.push('/'); };
 
@@ -54,6 +54,7 @@ function Me() {
         {tab === 'wallet' && <Wallet d={d} />}
         {tab === 'profile' && <Profile />}
         {tab === 'support' && <Support />}
+        {tab === 'notifications' && <Notifications />}
       </div>
     </div>
   );
@@ -147,7 +148,7 @@ function Wallet({ d }) {
     <div className="stats">
       <div className="stat vault"><small>ממתין בנאמנות</small><b className="mono">{ils(escrow)}</b></div>
       <div className="stat"><small>הועבר לחשבון</small><b className="mono">{ils(done.reduce((a, o) => a + o.seller_payout, 0))}</b></div>
-      <div className="stat"><small>עמלות ששולמו</small><b className="mono">{ils(done.reduce((a, o) => a + o.fee, 0))}</b></div>
+      <div className="stat"><small>עמלות ששולמו</small><b className="mono">{ils(done.reduce((a, o) => a + (o.seller_fee ?? o.fee), 0))}</b></div>
     </div>
     <section className="card stack"><h3>לאן מעבירים לך כסף</h3>
       {!edit ? <div className="lrow" style={{ padding: 0 }}><div className="grow"><b>{priv.bank_name}</b><span className="muted mono">חשבון ••••{priv.bank_last4}</span></div><button className="btn sm ghost" onClick={() => setEdit(true)}>החלפה</button></div>
@@ -156,7 +157,7 @@ function Wallet({ d }) {
           <button className="btn" style={{ justifySelf: 'start' }} onClick={save}>שמירה</button></>}
     </section>
     <section className="card"><h3 style={{ marginBottom: 8 }}>תשלומים שהתקבלו</h3>
-      {done.length ? <div className="rows">{done.map(o => <div className="lrow" key={o.id}><div className="grow"><b>{o.listing.title}</b><span className="muted num">{dShort(o.released_at)} · מחיר {ils(o.price)} · עמלה {ils(o.fee)}</span></div><b className="mono">{ils(o.seller_payout)}</b></div>)}</div> : <p className="muted">עוד לא התקבלו תשלומים.</p>}
+      {done.length ? <div className="rows">{done.map(o => <div className="lrow" key={o.id}><div className="grow"><b>{o.listing.title}</b><span className="muted num">{dShort(o.released_at)} · מחיר {ils(o.price)} · עמלה {ils(o.seller_fee ?? o.fee)}</span></div><b className="mono">{ils(o.seller_payout)}</b></div>)}</div> : <p className="muted">עוד לא התקבלו תשלומים.</p>}
     </section>
   </>;
 }
@@ -218,5 +219,24 @@ function Support() {
       </div>
       <form className="composer" onSubmit={send}><input value={t} onChange={e => setT(e.target.value)} placeholder="כתבו הודעה…" aria-label="הודעה" maxLength={2000} /><button className="btn">שליחה</button></form>
     </section>
+  </>;
+}
+
+function Notifications() {
+  const { user, refreshUnread } = useApp();
+  const [list, setList] = useState(null);
+  useEffect(() => {
+    sb.from('notifications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(100)
+      .then(async ({ data }) => { setList(data || []); await sb.rpc('mark_notifications_read'); refreshUnread(); });
+  }, [user, refreshUnread]);
+  return <>
+    <h1>התראות</h1>
+    <p className="muted" style={{ marginTop: -8 }}>כל מה שקורה בעסקאות ובמודעות שלך. בגרסה החיה ההתראות יישלחו גם בוואטסאפ ובמייל.</p>
+    {list === null ? <Loading /> : list.length ? <section className="card"><div className="notif-list">{list.map(n => (
+      <Link key={n.id} href={n.link || '/me/'} className={`notif ${n.read ? '' : 'new'}`}>
+        <span className="notif-dot" aria-hidden="true" />
+        <span className="notif-txt"><b>{n.title}</b>{n.body && <span>{n.body}</span>}</span>
+        <time className="num">{dTime(n.created_at)}</time>
+      </Link>))}</div></section> : <Empty>אין עדיין התראות. כשמישהו יקנה ממך או כשהמוכר יעביר לך, זה יופיע כאן.</Empty>}
   </>;
 }

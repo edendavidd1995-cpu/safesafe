@@ -53,7 +53,7 @@ function Order() {
   if (o.refunded) msg = `העסקה בוטלה. ${ils(o.price)} הוחזרו לקונה במלואם.`;
   else if (o.partial_refund) msg = `הוכרע: ${ils(o.partial_refund)} הוחזרו לקונה, ${ils(o.seller_payout)} הועברו למוכר.`;
   else if (o.frozen) msg = `העסקה מוקפאת: ${o.frozen_reason || 'בבדיקה'}. הכסף לא יעבור לאף צד עד שהצוות יכריע.`;
-  else if (o.step >= 4) msg = role === 'seller' ? `${ils(o.seller_payout)} הועברו לחשבון הבנק שלך. עמלה: ${ils(o.fee)}.` : 'העסקה הושלמה. הכסף שוחרר למוכר.';
+  else if (o.step >= 4) msg = role === 'seller' ? `${ils(o.seller_payout)} הועברו לחשבון הבנק שלך. עמלה: ${ils(o.seller_fee ?? o.fee)}.` : 'העסקה הושלמה. הכסף שוחרר למוכר.';
   else if (role === 'seller') {
     msg = [`הקונה שילם. עכשיו ${stay ? 'מעבירים את ההזמנה לשם' : 'מעבירים את הכרטיס ל'} ${o.buyer_name} מול ${l.provider || 'הספק'}. יש לך 48 שעות.`,
       'מחכים שהקונה יאשר שזה רשום על שמו, או שהצוות יאמת מול הספק.', `הכול מוכן. מחכים ל${stay ? 'צ׳ק-אין' : 'אירוע'}.`,
@@ -108,8 +108,9 @@ function Order() {
             <Guilloche seed={o.ref} />
             <span className="kicker" style={{ margin: 0 }}>קבלה · {o.ref}</span>
             <div className="sum">
-              <div><span className="muted">שולם לנאמנות</span><span className="mono">{ils(o.price)}</span></div>
-              {role !== 'buyer' && <div><span className="muted">עמלת SafeSafe (10%)</span><span className="mono">−{ils(o.fee)}</span></div>}
+              <div><span className="muted">מחיר הפריט</span><span className="mono">{ils(o.price)}</span></div>
+              {o.buyer_fee > 0 && role !== 'seller' && <div><span className="muted">עמלת שירות לקונה</span><span className="mono">{ils(o.buyer_fee)}</span></div>}
+              {role !== 'buyer' && <div><span className="muted">עמלת SafeSafe</span><span className="mono">−{ils(o.seller_fee ?? o.fee)}</span></div>}
               {o.partial_refund && <div><span className="muted">הוחזר לקונה</span><span className="mono">{ils(o.partial_refund)}</span></div>}
               <div className="total"><span>{role === 'buyer' ? 'מצב הכסף' : 'למוכר'}</span><span className="mono" style={{ fontSize: role === 'buyer' ? 20 : 30 }}>{role === 'buyer' ? st.t : ils(o.refunded ? 0 : o.seller_payout)}</span></div>
             </div>
