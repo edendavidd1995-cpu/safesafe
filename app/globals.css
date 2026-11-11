@@ -54,7 +54,7 @@ main{min-height:60vh}
 .top-in{display:flex;align-items:center;gap:20px;min-height:64px}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
 .brand-word{font-family:var(--f-d);font-weight:900;font-size:25px;letter-spacing:-.03em}
-.brand-word i{font-style:normal;color:var(--signal)}
+.brand-word i{font-style:normal;color:var(--vault)}
 .nav{display:flex;gap:2px}
 .nav a{padding:8px 12px;text-decoration:none;color:var(--ink-2);font-weight:500;border-bottom:2px solid transparent}
 .nav a[aria-current="page"]{color:var(--ink);border-color:var(--ink)}
@@ -465,3 +465,16 @@ details p{margin-top:8px}
 
 
 @media (max-width:420px){.fs{grid-template-columns:72px 1fr auto;gap:10px}.vdoor,.vdoor svg{width:72px;height:72px}.flow-line{inset-inline-start:35px}.coin{inset-inline-start:25px}}
+
+/* glyph layers + app icons */
+.glyph .g2{opacity:.5}
+.glyph .g3{opacity:.9}
+.appicon{position:relative;display:grid;place-items:center;flex:none;border-radius:27%;color:#fff;
+  background:linear-gradient(180deg,hsl(var(--h) 85% 62%),hsl(var(--h) 80% 46%));
+  box-shadow:0 6px 14px -6px hsl(var(--h) 70% 40% / .7),inset 0 1px 0 rgba(255,255,255,.35)}
+.appicon::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.22),transparent 48%);pointer-events:none}
+.appicon .glyph{position:relative;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}
+.appicon .glyph .g3{stroke:hsl(var(--h) 80% 40%);opacity:1}
+.acc-row.on .appicon{box-shadow:0 0 0 2px rgba(255,255,255,.55),0 6px 14px -6px rgba(0,0,0,.35)}
+.acc-row.none .appicon{filter:saturate(.35);opacity:.75}
+@media (max-width:640px){.acc-head .appicon{width:38px!important;height:38px!important}}

@@ -6,30 +6,36 @@ export function Mark({ size = 30 }) {
   // a safe-deposit dial
   return (
     <svg className="mark" width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="1" y="1" width="30" height="30" rx="7" fill="var(--ink)" />
-      <circle cx="16" cy="16" r="9" fill="none" stroke="var(--paper)" strokeWidth="1.6" />
+      <rect x="1" y="1" width="30" height="30" rx="8" fill="var(--vault)" />
+      <circle cx="16" cy="16" r="9" fill="none" stroke="#fff" strokeWidth="1.7" />
       {Array.from({ length: 12 }).map((_, i) => {
         const a = (i / 12) * Math.PI * 2, r1 = 10.8, r2 = i % 3 === 0 ? 13 : 12;
-        return <line key={i} x1={16 + r1 * Math.cos(a)} y1={16 + r1 * Math.sin(a)} x2={16 + r2 * Math.cos(a)} y2={16 + r2 * Math.sin(a)} stroke="var(--paper)" strokeWidth="1.1" />;
+        return <line key={i} x1={16 + r1 * Math.cos(a)} y1={16 + r1 * Math.sin(a)} x2={16 + r2 * Math.cos(a)} y2={16 + r2 * Math.sin(a)} stroke="#fff" strokeWidth="1.1" />;
       })}
       <line x1="16" y1="16" x2="16" y2="9.5" stroke="var(--signal)" strokeWidth="2.2" strokeLinecap="round" />
-      <circle cx="16" cy="16" r="2.2" fill="var(--paper)" />
+      <circle cx="16" cy="16" r="2.3" fill="#fff" />
     </svg>
   );
 }
 
 const G = {
-  hotel: <><path d="M3 18v-7h18v7M3 14h18M6 11V8a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3" /><path d="M3 18v2M21 18v2" /></>,
-  vacation: <><rect x="4" y="8" width="16" height="12" rx="2" /><path d="M9 8V5h6v3M4 13h16" /></>,
-  concert: <><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M6 11a6 6 0 0 0 12 0M12 17v4M9 21h6" /></>,
-  sports: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5l4 3-1.5 4.5h-5L8 10.5z" /><path d="M12 3.5v4M20 10l-4 .5M17 19l-2.5-4M7 19l2.5-4M4 10l4 .5" /></>,
-  festival: <><path d="M3 20L12 4l9 16z" /><path d="M12 4v16M8.5 20l3.5-6 3.5 6" /></>,
-  cruise: <><path d="M3 15l2 5h14l2-5z" /><path d="M6 15V9h12v6M9 9V6h6v3" /><path d="M2 21c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1" /></>,
-  flight: <><path d="M21 15.5l-8-4.5V5a1.5 1.5 0 0 0-3 0v6l-7 4.5v2l7-2v4l-2 1.5V22l3.5-1 3.5 1v-1l-2-1.5v-4l7 2z" /></>,
+  hotel: <><rect className="g2" x="5.5" y="7.2" width="6.5" height="4.3" rx="2.1" /><rect x="2" y="4.5" width="2.6" height="15" rx="1.3" /><path d="M4 11.2h14.5a3.5 3.5 0 0 1 3.5 3.5V17H4z" /><rect x="19.4" y="16" width="2.6" height="3.5" rx="1.3" /></>,
+  concert: <><rect x="8.3" y="2" width="7.4" height="12.4" rx="3.7" /><path className="g2" d="M5.2 10.6a.9.9 0 0 1 1.8 0 5 5 0 0 0 10 0 .9.9 0 0 1 1.8 0 6.8 6.8 0 0 1-5.9 6.74V20h2.6a.95.95 0 0 1 0 1.9H8.5a.95.95 0 0 1 0-1.9h2.6v-2.66A6.8 6.8 0 0 1 5.2 10.6z" /></>,
+  sports: <><circle className="g2" cx="12" cy="12" r="9.6" /><path d="M12 7.2l4.1 3-1.55 4.8h-5.1L7.9 10.2z" /><path className="g3" d="M12 2.4v4.8M21.1 9.2l-5 1M18 19.6l-3.45-4.6M6 19.6l3.45-4.6M2.9 9.2l5 1" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></>,
+  festival: <><path className="g2" d="M12 3.2l9.4 16.3a1 1 0 0 1-.87 1.5H3.47a1 1 0 0 1-.87-1.5z" /><path d="M12 9.5l4.7 11.5H7.3z" /><rect x="11.1" y="1" width="1.8" height="4.5" rx=".9" /><path d="M12.9 1.2l4 1.4-4 1.5z" /></>,
+  vacation: <><path className="g2" d="M8.5 6.5V5a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v1.5h-1.9V5.1h-3.2v1.4z" /><rect x="2.5" y="6.5" width="19" height="14" rx="3" /></>,
+  cruise: <><rect className="g2" x="8" y="3" width="6" height="4.5" rx="1" /><path className="g2" d="M5.5 8.2a1.2 1.2 0 0 1 1.2-1.2h10.6a1.2 1.2 0 0 1 1.2 1.2v4H5.5z" /><path d="M2.3 12.5h19.4l-2.6 6.2H4.9z" /><path d="M2 21.2c1.7 0 1.7-1 3.33-1s1.67 1 3.34 1 1.66-1 3.33-1 1.67 1 3.33 1 1.67-1 3.34-1S20.3 21.2 22 21.2" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" /></>,
+  flight: <><path d="M21.2 15.6l-8-4.7V4.6a1.7 1.7 0 0 0-3.4 0v6.3l-7.9 4.7a.9.9 0 0 0-.4.75v1.15l8.3-2.45v4.25l-2.1 1.55a.6.6 0 0 0-.25.5v.9l3.6-1 3.6 1v-.9a.6.6 0 0 0-.25-.5l-2.1-1.55v-4.25l8.3 2.45v-1.15a.9.9 0 0 0-.4-.75z" /></>,
 };
+export const CAT_HUE = { hotel: 212, concert: 330, sports: 145, festival: 28, vacation: 262, cruise: 190, flight: 245 };
 export function Glyph({ cat, size = 22 }) {
-  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" aria-hidden="true">{G[cat] || G.hotel}</svg>;
+  return <svg className="glyph" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">{G[cat] || G.hotel}</svg>;
 }
+// iOS-style app icon: gradient squircle with a white glyph
+export function AppIcon({ cat, size = 44 }) {
+  return <span className="appicon" style={{ '--h': CAT_HUE[cat] ?? 250, width: size, height: size }}><Glyph cat={cat} size={Math.round(size * 0.52)} /></span>;
+}
+
 
 // Banknote-style rosette. Deterministic per seed so each certificate is unique.
 export function Guilloche({ seed = 'x', className = '', lines = 18 }) {

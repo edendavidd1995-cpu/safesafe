@@ -5,9 +5,8 @@ import { useRouter } from 'next/navigation';
 import { sb } from '@/lib/supabase';
 import { CATS, CAT_KEYS, ils, num, FEE, SELLER_COLS, dShort } from '@/lib/util';
 
-const CAT_HUE = { hotel: 196, concert: 336, sports: 142, festival: 28, vacation: 218, cruise: 186, flight: 258 };
 import { useApp } from '@/components/App';
-import { Ticket, Glyph, Guilloche, Loading } from '@/components/Bits';
+import { Ticket, Glyph, Guilloche, Loading, AppIcon, CAT_HUE } from '@/components/Bits';
 
 export default function Home() {
   const { stats } = useApp();
@@ -62,7 +61,7 @@ export default function Home() {
               return (
                 <div key={k} className={`acc-row ${on ? 'on' : ''} ${!list.length ? 'none' : ''}`} style={{ '--h': CAT_HUE[k] }}>
                   <button className="acc-head" aria-expanded={on} aria-controls={`acc-${k}`} onClick={() => setSel(on ? null : k)}>
-                    <span className="acc-ico"><Glyph cat={k} size={20} /></span>
+                    <AppIcon cat={k} size={44} />
                     <b className="acc-nm">{CATS[k].he}</b>
                     <span className="acc-meta">{list.length ? <>{list.length} פריטים · מ-<b className="num">{ils(min)}</b></> : CATS[k].soon ? 'בקרוב' : 'אין כרגע'}</span>
                     <svg className="acc-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
